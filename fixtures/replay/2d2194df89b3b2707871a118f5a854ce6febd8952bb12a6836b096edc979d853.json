@@ -1,6 +1,6 @@
 {
- "latency_ms": 159.9,
- "recorded_at": "2026-10-10T12:28:37",
+ "latency_ms": 146.4,
+ "recorded_at": "2026-10-10T12:44:27",
  "request": {
   "api": "decisions.create",
   "input": "Blood request c05 from a hospital.\nHospital note: \"5 units O-negative for ruptured ectopic pregnancy, patient O-negative, in shock.\"\nParsed by code from the note: blood group O-, units 5.",

@@ -1,6 +1,6 @@
 {
- "latency_ms": 248.5,
- "recorded_at": "2026-10-10T12:28:40",
+ "latency_ms": 112.0,
+ "recorded_at": "2026-10-10T12:44:29",
  "request": {
   "api": "decisions.create",
   "input": "Blood request c13 from a hospital.\nHospital note: \"4 units O-negative for 45M upper GI bleed, typed O-negative, stable for now but Hb dropping.\"\nParsed by code from the note: blood group O-, units 4.",

@@ -1,6 +1,6 @@
 {
- "latency_ms": 294.1,
- "recorded_at": "2026-10-10T12:30:45",
+ "latency_ms": 282.2,
+ "recorded_at": "2026-10-10T12:44:15",
  "request": {
   "api": "decisions.create",
   "input": "Blood request req-c21e657336 from a hospital: 2 units of O- packed red cells. Request urgency (judged earlier): massive transfusion or life-threatening.\nHospital note: \"2 units O-negative needed now. Massive transfusion protocol activated: 29F post-partum haemorrhage after caesarean, patient typed O-negative, ongoing bleeding.\"\nCandidate bank: Ntr Memorial Trust Blood Centre Rajamahendravaram.\nGroup that would be dispensed: O- (exact match).\nO- units at this bank now: 4. Units remaining after this dispatch: 2.\nUnits of O- already requested by pending orders at this bank: 0.\nPending orders at this bank for O-: none",

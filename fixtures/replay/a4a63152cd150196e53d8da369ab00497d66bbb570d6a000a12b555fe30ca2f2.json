@@ -1,6 +1,6 @@
 {
- "latency_ms": 120.2,
- "recorded_at": "2026-10-10T12:28:35",
+ "latency_ms": 137.9,
+ "recorded_at": "2026-10-10T12:44:26",
  "request": {
   "api": "decisions.create",
   "input": "Blood request c02 from a hospital.\nHospital note: \"4 units O positive, MTP activated, 52M ruptured abdominal aortic aneurysm, typed O-positive.\"\nParsed by code from the note: blood group O+, units 4.",

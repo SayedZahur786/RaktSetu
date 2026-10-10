@@ -1,6 +1,6 @@
 {
- "latency_ms": 133.5,
- "recorded_at": "2026-10-10T12:28:44",
+ "latency_ms": 174.8,
+ "recorded_at": "2026-10-10T12:44:34",
  "request": {
   "api": "decisions.create",
   "input": "Blood request c22 from a hospital: 8 units of O+ packed red cells. Request urgency (judged earlier): routine restock.\nHospital note: \"Standing order: 8 units O+ for the district hospital shelf.\"\nCandidate bank: Gsl Medical College And General Hospital Blood Centre.\nGroup that would be dispensed: O+ (exact match).\nO+ units at this bank now: 25. Units remaining after this dispatch: 17.\nUnits of O+ already requested by pending orders at this bank: 0.\nPending orders at this bank for O+: none",

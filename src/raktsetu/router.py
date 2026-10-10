@@ -19,7 +19,8 @@ from . import compat, policy as pol
 from . import config
 from .audit import AuditLog
 from .config import DATA_DIR
-from .decide import REQUEST_QUESTIONS, URGENCY_LEVELS, Decider, OpenAIDecider, OutageDecider, candidate_questions
+from .decide import (REQUEST_QUESTIONS, URGENCY_LEVELS, Decider, OpenAIDecider, OutageDecider, candidate_questions,
+                     substitution_question)
 from .eraktkosh import load_snapshot, load_stock
 from .models import BloodGroup, Candidate, PendingOrder, Policy, QuestionSpec, Recommendation, Request, StockSnapshot, Verdict
 from .replay import FixtureMissing, ReplayStore
@@ -29,7 +30,11 @@ log = logging.getLogger(__name__)
 
 DEMO_FILE = DATA_DIR / "demo_requests.json"
 MAX_PARALLEL_CALLS = 8
-_UNITS_RE = re.compile(r"\b(\d{1,3})\s*(?:units?|u|bags?|pints?|PRBCs?|RBCs?)\b|[x×]\s*(\d{1,3})\b", re.IGNORECASE)
+_RANGE_RE = re.compile(r"\b\d{1,3}\s*(?:-|–|to|or)\s*\d{1,3}\s*(?:units?|u|bags?|pints?)\b", re.IGNORECASE)
+_SECRET_RE = re.compile(r"sk-[A-Za-z0-9_\-*]{6,}")
+# "2 units", "2u", "x2", and up to two words between number and unit ("4 more units", "3 O-neg units").
+_UNITS_RE = re.compile(r"\b(\d{1,3})\s*(?:[A-Za-z+\-]+\s+){0,2}(?:units?|u|bags?|pints?|PRBCs?|RBCs?)\b"
+                       r"|[x×]\s*(\d{1,3})\b", re.IGNORECASE)
 
 
 class Scenario(BaseModel):
@@ -57,11 +62,13 @@ def content_request_id(note: str, hospital: str | None) -> str:
 
 
 def parse_request(request_id: str | None, note: str, hospital: str | None = None) -> Request:
-    """Structured fields come from code. Unparseable fields stay None and force a hold."""
+    """Structured fields come from code. Unparseable or ambiguous fields stay None and force a hold:
+    a range ("1-2 units") or two different unit counts in one note are never guessed between."""
     request_id = request_id or content_request_id(note, hospital)
-    m = _UNITS_RE.search(note)
-    n = int(m.group(1) or m.group(2)) if m else 0
-    units = n if n > 0 else None
+    counts = {int(a or b) for a, b in _UNITS_RE.findall(note)}
+    units = counts.pop() if len(counts) == 1 and not _RANGE_RE.search(note) else None
+    if units == 0:
+        units = None
     return Request(id=request_id, note=note.strip(), blood_group=compat.parse_group(note), units=units,
                    hospital=hospital)
 
@@ -109,8 +116,9 @@ class Router:
         except FixtureMissing:
             raise
         except Exception as ex:  # network, timeout, auth, malformed response: all hold
-            log.warning("decision call failed: %s: %s", type(ex).__name__, ex)
-            return Verdict(error=f"{type(ex).__name__}: {ex}", model=getattr(self.decider, "model", None))
+            message = _SECRET_RE.sub("[redacted]", f"{type(ex).__name__}: {ex}")
+            log.warning("decision call failed: %s", message)
+            return Verdict(error=message, model=getattr(self.decider, "model", None))
 
     def _build(self, req: Request, stock: StockSnapshot, group: BloodGroup, exact: bool,
                needs_permission: bool) -> list[Candidate]:
@@ -119,9 +127,10 @@ class Router:
         for b in stock.banks:
             if b.blood_group != group or b.units <= 0:
                 continue
-            _, summary = pending_summary(self.pending, b.name, group)
+            pending_units, summary = pending_summary(self.pending, b.name, group)
             c = Candidate(bank=b.name, blood_group=group, exact=exact, needs_permission=needs_permission,
-                          units_now=b.units, units_after=b.units - req.units, pending_summary=summary)
+                          units_now=b.units, units_after=b.units - req.units, pending_units=pending_units,
+                          pending_summary=summary)
             if b.units < req.units:
                 c.status, c.units_after = "NO_STOCK", b.units
                 c.reasons = [f"only {b.units} unit(s) of {group}, {req.units} needed"]
@@ -129,21 +138,32 @@ class Router:
         return out
 
     def _judge(self, req: Request, candidates: list[Candidate], urgency: str | None) -> None:
+        """Per-bank reserve/priority calls (concurrent). Substitution permission is a property of the
+        note, so it is asked once per substitute group and the same answer applies to every bank."""
         todo = [c for c in candidates if c.status != "NO_STOCK"]
+        if not todo or req.blood_group is None:
+            return
+        requested = req.blood_group
+        permission: dict[BloodGroup, Verdict] = {
+            g: self._ask(request_facts(req), [substitution_question(g, requested)])
+            for g in sorted({c.blood_group for c in todo if c.needs_permission})}
 
         def run(c: Candidate) -> Verdict:
-            pending_units, _ = pending_summary(self.pending, c.bank, c.blood_group)
-            sub = c.blood_group if c.needs_permission else None
-            assert req.blood_group is not None
-            return self._ask(candidate_facts(req, c, urgency, pending_units), candidate_questions(sub, req.blood_group))
+            return self._ask(candidate_facts(req, c, urgency, c.pending_units), candidate_questions())
 
-        if not todo:
-            return
         with ThreadPoolExecutor(max_workers=min(MAX_PARALLEL_CALLS, len(todo))) as pool:
             verdicts = list(pool.map(run, todo))
         for c, v in zip(todo, verdicts):
+            if c.needs_permission and not v.error:
+                granted = permission[c.blood_group]
+                answer = granted.answers.get("substitution_ok")
+                if answer is not None:
+                    v.answers["substitution_ok"] = answer
+                elif granted.error:
+                    v = v.model_copy(update={"error": f"substitution_ok: {granted.error}"})
             c.verdict = v
-            c.status, c.reasons = pol.candidate_status(v, c.needs_permission, self.policy, c.units_after)
+            c.status, c.reasons = pol.candidate_status(v, c.needs_permission, self.policy, c.units_after,
+                                                       c.pending_units)
 
     def route(self, req: Request, stock: StockSnapshot) -> Recommendation:
         urgency_v = self._ask(request_facts(req), REQUEST_QUESTIONS)
@@ -154,8 +174,16 @@ class Router:
         if req.units is None:
             gate_ok, reasons = False, reasons + ["number of units not stated in the note"]
 
+        if req.blood_group is not None and req.blood_group not in stock.groups:
+            gate_ok, reasons = False, reasons + [
+                f"{req.blood_group} stock is not fetched from e-RaktKosh in this deployment "
+                f"(only {', '.join(stock.groups) or 'none'}); an officer must check {req.blood_group} availability"]
+        if stock.fallback:
+            reasons = reasons + [f"live stock unavailable; showing the {stock.fetched_at} snapshot, "
+                                 "so nothing can be recommended"]
+
         candidates: list[Candidate] = []
-        if req.blood_group is not None and req.units is not None:
+        if req.blood_group is not None and req.units is not None and req.blood_group in stock.groups:
             candidates = self._build(req, stock, req.blood_group, exact=True, needs_permission=False)
             if gate_ok:
                 self._judge(req, candidates, label)
@@ -173,11 +201,15 @@ class Router:
                     if c.status != "NO_STOCK":
                         c.status, c.reasons = "HOLD_FOR_HUMAN", ["request held before per-bank checks"]
 
+        if stock.fallback:
+            for c in candidates:
+                if c.status == "RECOMMEND":
+                    c.status, c.reasons = "HOLD_FOR_HUMAN", ["stock is a stale snapshot (live fetch failed)"]
         ranked = pol.rank(candidates)
         status = pol.request_status(gate_ok, ranked)
         if status == "NO_STOCK" and not reasons:
             reasons = [f"no bank in {stock.region} holds {req.units} units of {req.blood_group} or a substitute"]
-        if status == "HOLD_FOR_HUMAN" and gate_ok:
+        if status == "HOLD_FOR_HUMAN" and gate_ok and not stock.fallback:
             reasons = reasons + ["no candidate bank passed every check"]
         chosen = next((c for c in ranked if c.status == "RECOMMEND"), None) if status == "ROUTED" else None
         rec = Recommendation(request=req, status=status, reasons=reasons, urgency=urgency_v, urgency_label=label,

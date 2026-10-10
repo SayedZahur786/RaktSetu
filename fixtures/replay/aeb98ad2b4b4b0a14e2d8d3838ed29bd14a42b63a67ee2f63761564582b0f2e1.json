@@ -1,6 +1,6 @@
 {
- "latency_ms": 138.1,
- "recorded_at": "2026-10-10T12:28:39",
+ "latency_ms": 199.0,
+ "recorded_at": "2026-10-10T12:44:29",
  "request": {
   "api": "decisions.create",
   "input": "Blood request c11 from a hospital: 3 units of O+ packed red cells. Request urgency (judged earlier): urgent.\nHospital note: \"3 units O+ for sickle cell crisis, 19M typed O+, transfuse within hours.\"\nCandidate bank: Dr. Ysr-Jakkampudi Rammohan Rao Blood Centre.\nGroup that would be dispensed: O+ (exact match).\nO+ units at this bank now: 92. Units remaining after this dispatch: 89.\nUnits of O+ already requested by pending orders at this bank: 0.\nPending orders at this bank for O+: none",

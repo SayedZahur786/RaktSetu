@@ -1,0 +1,38 @@
+{
+ "latency_ms": 155.5,
+ "recorded_at": "2026-10-10T12:44:34",
+ "request": {
+  "api": "decisions.create",
+  "input": "Blood request c23 from a hospital.\nHospital note: \"Restock 6 units O-negative for the CHC shelf, no active cases.\"\nParsed by code from the note: blood group O-, units 6.",
+  "model": "gpt-6-luna",
+  "questions": [
+   {
+    "instructions": "The note says the patients who will receive this blood are Rh-positive (or of a group that can receive O+), so O+ red cells could be given instead of the O- requested.",
+    "name": "substitution_ok",
+    "type": "predicate"
+   }
+  ]
+ },
+ "response": {
+  "answers": [
+   {
+    "name": "substitution_ok",
+    "probability": 0.01,
+    "type": "predicate"
+   }
+  ],
+  "model": "gpt-6-luna",
+  "usage": {
+   "input_tokens": 231,
+   "input_tokens_details": {
+    "cache_write_tokens": 0,
+    "cached_tokens": 0
+   },
+   "output_tokens": 0,
+   "output_tokens_details": {
+    "reasoning_tokens": 0
+   },
+   "total_tokens": 231
+  }
+ }
+}

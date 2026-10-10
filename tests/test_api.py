@@ -23,7 +23,7 @@ def test_route_then_confirm_writes_audit_only(policy, tmp_path):
     rec = c.post("/route", json={"text": "2 units O-negative, PPH, massive transfusion"}).json()
     assert rec["status"] == "ROUTED" and rec["data_source"].startswith("snapshot")
     chosen = rec["chosen"]
-    r = c.post("/confirm", json={"request_id": rec["request"]["id"], "bank": chosen["bank"],
+    r = c.post("/confirm", json={"decision_id": rec["decision_id"], "bank": chosen["bank"],
                                  "blood_group": chosen["blood_group"], "officer": "Dr. Test"})
     assert r.status_code == 200 and "Nothing has been dispatched" in r.json()["note"]
     line = json.loads(audit_path.read_text().splitlines()[-1])
@@ -34,14 +34,14 @@ def test_blocked_candidate_cannot_be_confirmed(policy, tmp_path):
     c, _ = client(policy, tmp_path, bank=lambda t, n: bank_verdict(safe=0.0, unsafe=1.0))
     rec = c.post("/route", json={"text": "2 units O-negative, PPH"}).json()
     blocked = next(x for x in rec["candidates"] if x["status"] == "BLOCKED")
-    r = c.post("/confirm", json={"request_id": rec["request"]["id"], "bank": blocked["bank"],
+    r = c.post("/confirm", json={"decision_id": rec["decision_id"], "bank": blocked["bank"],
                                  "blood_group": blocked["blood_group"], "officer": "Dr. Test"})
     assert r.status_code == 409
 
 
 def test_unknown_request_cannot_be_confirmed(policy, tmp_path):
     c, _ = client(policy, tmp_path)
-    r = c.post("/confirm", json={"request_id": "nope", "bank": "Bank B", "blood_group": "O-", "officer": "x"})
+    r = c.post("/confirm", json={"decision_id": "nope", "bank": "Bank B", "blood_group": "O-", "officer": "x"})
     assert r.status_code == 404
 
 

@@ -27,7 +27,7 @@
       "title": "Routine restock that would drain the reserve",
       "hospital": "Community Health Centre, Peddapuram",
       "note": "Standing weekly restock: 10 units O-negative. No active cases. Ward patients are all typed Rh-positive; we keep O-neg on the shelf out of habit.",
-      "expected_status": "ROUTED"
+      "expected_status": "HOLD_FOR_HUMAN"
     },
     {
       "id": "demo3",

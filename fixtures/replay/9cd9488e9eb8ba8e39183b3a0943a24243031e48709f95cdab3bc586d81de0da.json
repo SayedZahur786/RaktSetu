@@ -1,6 +1,6 @@
 {
- "latency_ms": 163.9,
- "recorded_at": "2026-10-10T12:28:44",
+ "latency_ms": 179.2,
+ "recorded_at": "2026-10-10T12:44:33",
  "request": {
   "api": "decisions.create",
   "input": "Blood request c21 from a hospital: 5 units of O+ packed red cells. Request urgency (judged earlier): routine restock.\nHospital note: \"Routine restock: 5 units O-positive for the blood storage unit.\"\nCandidate bank: Dhanwantani Voluntary Blood Bank.\nGroup that would be dispensed: O+ (exact match).\nO+ units at this bank now: 40. Units remaining after this dispatch: 35.\nUnits of O+ already requested by pending orders at this bank: 0.\nPending orders at this bank for O+: none",

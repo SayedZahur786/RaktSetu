@@ -1,6 +1,6 @@
 {
- "latency_ms": 190.9,
- "recorded_at": "2026-10-10T12:28:36",
+ "latency_ms": 166.7,
+ "recorded_at": "2026-10-10T12:44:27",
  "request": {
   "api": "decisions.create",
   "input": "Blood request c03 from a hospital: 6 units of O+ packed red cells. Request urgency (judged earlier): massive transfusion or life-threatening.\nHospital note: \"6 units O+ for road traffic polytrauma in haemorrhagic shock, patient typed O+.\"\nCandidate bank: Satya Surya Voluntary Blood Center.\nGroup that would be dispensed: O+ (exact match).\nO+ units at this bank now: 23. Units remaining after this dispatch: 17.\nUnits of O+ already requested by pending orders at this bank: 0.\nPending orders at this bank for O+: none",

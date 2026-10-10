@@ -1,6 +1,6 @@
 {
- "latency_ms": 235.9,
- "recorded_at": "2026-10-10T12:28:39",
+ "latency_ms": 122.1,
+ "recorded_at": "2026-10-10T12:44:29",
  "request": {
   "api": "decisions.create",
   "input": "Blood request c10 from a hospital.\nHospital note: \"1 unit O-negative for neonatal exchange transfusion today, baby typed O-negative.\"\nParsed by code from the note: blood group O-, units 1.",

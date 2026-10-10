@@ -1,6 +1,6 @@
 {
- "latency_ms": 164.3,
- "recorded_at": "2026-10-10T12:28:42",
+ "latency_ms": 156.2,
+ "recorded_at": "2026-10-10T12:44:31",
  "request": {
   "api": "decisions.create",
   "input": "Blood request c17 from a hospital.\nHospital note: \"Reserve 3 units A-negative for elective CABG on Thursday, patient A-negative.\"\nParsed by code from the note: blood group A-, units 3.",

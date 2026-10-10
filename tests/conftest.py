@@ -66,8 +66,10 @@ class ScriptedDecider:
         return out
 
 
-def stock(*rows: tuple[str, str, int]) -> StockSnapshot:
+def stock(*rows: tuple[str, str, int], groups: tuple[str, ...] = ("O-", "O+")) -> StockSnapshot:
+    """A test snapshot. Like e-RaktKosh here, only O-/O+ are 'fetched' unless `groups` says otherwise."""
     return StockSnapshot(source="snapshot", fetched_at="2026-09-26T05:19:57", region="Test District",
+                         groups=list(groups),  # type: ignore[arg-type]
                          banks=[BankStock(name=n, blood_group=g, units=u) for n, g, u in rows])  # type: ignore[arg-type]
 
 

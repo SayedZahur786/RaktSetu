@@ -1,6 +1,6 @@
 {
- "latency_ms": 115.9,
- "recorded_at": "2026-10-10T12:28:40",
+ "latency_ms": 122.0,
+ "recorded_at": "2026-10-10T12:44:30",
  "request": {
   "api": "decisions.create",
   "input": "Blood request c13 from a hospital: 4 units of O- packed red cells. Request urgency (judged earlier): urgent.\nHospital note: \"4 units O-negative for 45M upper GI bleed, typed O-negative, stable for now but Hb dropping.\"\nCandidate bank: Dr. Ysr-Jakkampudi Rammohan Rao Blood Centre.\nGroup that would be dispensed: O- (exact match).\nO- units at this bank now: 12. Units remaining after this dispatch: 8.\nUnits of O- already requested by pending orders at this bank: 8.\nPending orders at this bank for O-: 8u O-: Tomorrow 09:00: 41F, typed O-negative, placenta accreta for planned caesarean hysterectomy, history of massive haemorrhage. 8 units O-neg reserved for her.",

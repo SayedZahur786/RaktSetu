@@ -1,6 +1,6 @@
 {
- "latency_ms": 164.2,
- "recorded_at": "2026-10-10T12:28:41",
+ "latency_ms": 189.0,
+ "recorded_at": "2026-10-10T12:44:31",
  "request": {
   "api": "decisions.create",
   "input": "Blood request c15 from a hospital: 2 units of O+ packed red cells. Request urgency (judged earlier): planned / elective.\nHospital note: \"Planned thalassaemia day-care transfusion next Tuesday: 2 units O+, child typed O-positive.\"\nCandidate bank: Dr. Ysr-Jakkampudi Rammohan Rao Blood Centre.\nGroup that would be dispensed: O+ (exact match).\nO+ units at this bank now: 92. Units remaining after this dispatch: 90.\nUnits of O+ already requested by pending orders at this bank: 0.\nPending orders at this bank for O+: none",

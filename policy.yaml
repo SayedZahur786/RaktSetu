@@ -13,6 +13,7 @@ substitution_min_p: 0.75       # conditional substitute needs p(note permits) >=
 substitution_block_p: 0.25     # p(note permits) < this -> substitute BLOCKED
 min_units_after_dispatch: 1    # units left at the bank below this -> HOLD_FOR_HUMAN (never empty a bank unasked).
                                # Added after the first live eval: c13 routed 4 units leaving a bank with 0 O-neg.
+hold_on_pending_shortfall: true # units left < units already pending at the bank -> HOLD_FOR_HUMAN (code check)
 
 fail_mode: closed              # any error/refusal -> HOLD_FOR_HUMAN (only "closed" is supported)
 

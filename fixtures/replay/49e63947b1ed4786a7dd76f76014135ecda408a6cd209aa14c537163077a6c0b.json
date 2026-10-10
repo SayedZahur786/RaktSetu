@@ -1,6 +1,6 @@
 {
- "latency_ms": 581.3,
- "recorded_at": "2026-10-10T12:30:58",
+ "latency_ms": 330.4,
+ "recorded_at": "2026-10-10T12:44:21",
  "request": {
   "api": "decisions.create",
   "input": "Blood request req-1d24af1b4c from a hospital.\nHospital note: \"2 units O-negative, massive transfusion, Jayanagar\"\nParsed by code from the note: blood group O-, units 2.",

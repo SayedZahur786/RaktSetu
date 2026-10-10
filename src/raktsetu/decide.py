@@ -15,6 +15,7 @@ Verified against openai-python 3.28.0 (`client.decisions.create(model, input, qu
 """
 from __future__ import annotations
 
+import math
 import threading
 from typing import Any, Protocol
 
@@ -66,15 +67,15 @@ PRIORITY_CHECK = QuestionSpec(
 def substitution_question(substitute: BloodGroup, requested: BloodGroup) -> QuestionSpec:
     return QuestionSpec(
         name="substitution_ok", kind="predicate",
-        instructions=f"The note indicates that the patients this blood is for can safely receive {substitute} red "
-                     f"cells instead of {requested}, for example because it says they are Rh-positive.")
+        instructions=f"The note says the patients who will receive this blood are Rh-positive (or of a group that "
+                     f"can receive {substitute}), so {substitute} red cells could be given instead of the {requested} "
+                     f"requested.")
 
 
-def candidate_questions(substitute: BloodGroup | None, requested: BloodGroup) -> list[QuestionSpec]:
-    questions = [RESERVE_CHECK, PRIORITY_CHECK]
-    if substitute is not None:
-        questions.append(substitution_question(substitute, requested))
-    return questions
+def candidate_questions() -> list[QuestionSpec]:
+    """Per-bank questions. substitution_ok is about the note, not the bank, so the router asks it
+    once per request (see router.Router._judge) instead of once per bank."""
+    return [RESERVE_CHECK, PRIORITY_CHECK]
 
 
 # ───────────────────────────── adapter interface ─────────────────────────────
@@ -107,11 +108,15 @@ def to_wire(q: QuestionSpec) -> dict[str, Any]:
     return wire
 
 
-def _num(raw: dict[str, Any], key: str) -> float:
+def _num(raw: dict[str, Any], key: str, upper: float | None = 1.0) -> float:
+    """A finite number in [0, upper]. NaN, infinities and out-of-range values raise (fail closed)."""
     value = raw.get(key)
     if not isinstance(value, (int, float)) or isinstance(value, bool):
         raise ValueError(f"answer field {key!r} missing or not numeric: {value!r}")
-    return float(value)
+    number = float(value)
+    if not math.isfinite(number) or number < 0 or (upper is not None and number > upper):
+        raise ValueError(f"answer field {key!r} out of range: {value!r}")
+    return number
 
 
 def parse_answer(raw: dict[str, Any], expected: QuestionSpec) -> Answer:
@@ -131,7 +136,8 @@ def parse_answer(raw: dict[str, Any], expected: QuestionSpec) -> Answer:
             raise ValueError(f"question {expected.name!r}: choice missing")
         return Answer(name=expected.name, kind="choice", choice=str(choice), confidence=_num(raw, "confidence"),
                       probabilities={str(p["value"]): _num(p, "probability") for p in probs_raw})
-    return Answer(name=expected.name, kind="score", score=_num(raw, "score"), confidence=_num(raw, "confidence"),
+    return Answer(name=expected.name, kind="score", score=_num(raw, "score", upper=len(expected.options) - 1),
+                  confidence=_num(raw, "confidence"),
                   probabilities={str(p["label"]): _num(p, "probability") for p in probs_raw})
 
 

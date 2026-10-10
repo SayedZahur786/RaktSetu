@@ -33,7 +33,8 @@ class AuditLog:
     def record_decision(self, rec: Recommendation) -> None:
         """One line for the request, then one per candidate, with raw probabilities and reasons."""
         self._append({
-            "event": "REQUEST_DECISION", "request_id": rec.request.id, "status": rec.status, "reasons": rec.reasons,
+            "event": "REQUEST_DECISION", "decision_id": rec.decision_id, "request_id": rec.request.id,
+            "status": rec.status, "reasons": rec.reasons,
             "blood_group": rec.request.blood_group, "units": rec.request.units, "urgency_label": rec.urgency_label,
             "urgency": _answers(rec.urgency), "data_source": rec.data_source,
             "chosen": rec.chosen.bank if rec.chosen else None,
@@ -44,12 +45,18 @@ class AuditLog:
             self._append(self._candidate_record(rec, c))
 
     def _candidate_record(self, rec: Recommendation, c: Candidate) -> dict[str, Any]:
-        return {"event": "CANDIDATE_DECISION", "request_id": rec.request.id, "bank": c.bank,
-                "blood_group": c.blood_group, "exact": c.exact, "units_now": c.units_now, "units_after": c.units_after,
+        return {"event": "CANDIDATE_DECISION", "decision_id": rec.decision_id, "request_id": rec.request.id,
+                "bank": c.bank, "blood_group": c.blood_group, "exact": c.exact, "units_now": c.units_now, "units_after": c.units_after,
+                "pending_units": c.pending_units,
                 "status": c.status, "reasons": c.reasons, "verdict": _answers(c.verdict),
                 "data_source": rec.data_source}
 
-    def record_confirmation(self, request_id: str, bank: str, blood_group: str, units: int, officer: str) -> None:
-        """An officer confirmed a dispatch. This is the only effect a confirmation has."""
-        self._append({"event": "CONFIRMED", "request_id": request_id, "bank": bank, "blood_group": blood_group,
-                      "units": units, "officer": officer})
+    def record_confirmation(self, decision_id: str, request_id: str, bank: str, blood_group: str, units: int,
+                            officer: str, candidate_status: str, candidate_reasons: list[str]) -> None:
+        """An officer confirmed a dispatch. This is the only effect a confirmation has.
+
+        Confirming anything other than a RECOMMEND candidate is recorded as an override."""
+        self._append({"event": "CONFIRMED", "decision_id": decision_id, "request_id": request_id, "bank": bank,
+                      "blood_group": blood_group, "units": units, "officer": officer,
+                      "candidate_status": candidate_status, "candidate_reasons": candidate_reasons,
+                      "override": candidate_status != "RECOMMEND"})

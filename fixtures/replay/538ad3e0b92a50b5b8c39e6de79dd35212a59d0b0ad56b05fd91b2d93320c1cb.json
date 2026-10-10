@@ -1,6 +1,6 @@
 {
- "latency_ms": 646.1,
- "recorded_at": "2026-10-10T12:30:44",
+ "latency_ms": 308.3,
+ "recorded_at": "2026-10-10T12:44:15",
  "request": {
   "api": "decisions.create",
   "input": "Blood request req-c21e657336 from a hospital.\nHospital note: \"2 units O-negative needed now. Massive transfusion protocol activated: 29F post-partum haemorrhage after caesarean, patient typed O-negative, ongoing bleeding.\"\nParsed by code from the note: blood group O-, units 2.",

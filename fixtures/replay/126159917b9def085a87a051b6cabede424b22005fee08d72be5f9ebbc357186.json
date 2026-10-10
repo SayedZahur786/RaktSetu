@@ -1,6 +1,6 @@
 {
- "latency_ms": 129.3,
- "recorded_at": "2026-10-10T12:28:44",
+ "latency_ms": 113.6,
+ "recorded_at": "2026-10-10T12:44:34",
  "request": {
   "api": "decisions.create",
   "input": "Blood request c23 from a hospital.\nHospital note: \"Restock 6 units O-negative for the CHC shelf, no active cases.\"\nParsed by code from the note: blood group O-, units 6.",

@@ -1,6 +1,6 @@
 {
- "latency_ms": 4746.4,
- "recorded_at": "2026-10-10T12:26:16",
+ "latency_ms": 4143.5,
+ "recorded_at": "2026-10-10T12:44:14",
  "request": {
   "api": "responses.create",
   "input": "{\"chosen\": null, \"data_source\": \"snapshot e-RaktKosh, East Godavari, Andhra Pradesh, 2026-09-26T05:19:57\", \"other_candidates\": [{\"bank\": \"Dr. Ysr-Jakkampudi Rammohan Rao Blood Centre\", \"dispensed_group\": \"O-\", \"exact_match\": true, \"pending_at_bank\": \"8u O-: Tomorrow 09:00: 41F, typed O-negative, placenta accreta for planned caesarean hysterectomy, history of massive haemorrhage. 8 units O-neg reserved for her.\", \"reasons\": [\"request held before per-bank checks\"], \"status\": \"HOLD_FOR_HUMAN\", \"units_after_dispatch\": 10, \"units_now\": 12, \"verdicts\": {}}, {\"bank\": \"Government Teaching General Hospital Blood Centre, Rajahmundry\", \"dispensed_group\": \"O-\", \"exact_match\": true, \"pending_at_bank\": \"6u O-: Trauma theatre now: 24M road-traffic polytrauma with splenic rupture, typed O-negative, haemodynamically unstable. Massive transfusion protocol on standby; all 6 O-neg units earmarked for this patient.\", \"reasons\": [\"request held before per-bank checks\"], \"status\": \"HOLD_FOR_HUMAN\", \"units_after_dispatch\": 4, \"units_now\": 6, \"verdicts\": {}}, {\"bank\": \"Ntr Memorial Trust Blood Centre Rajamahendravaram\", \"dispensed_group\": \"O-\", \"exact_match\": true, \"pending_at_bank\": \"none\", \"reasons\": [\"request held before per-bank checks\"], \"status\": \"HOLD_FOR_HUMAN\", \"units_after_dispatch\": 2, \"units_now\": 4, \"verdicts\": {}}], \"request\": {\"blood_group\": \"O-\", \"hospital\": \"Area Hospital, Rajahmundry (labour ward)\", \"id\": \"demo4\", \"note\": \"2 units O-negative needed now. Massive transfusion protocol activated: 29F post-partum haemorrhage after caesarean, patient typed O-negative, ongoing bleeding.\", \"units\": 2}, \"status\": \"HOLD_FOR_HUMAN\", \"status_reasons\": [\"decision call failed: ConnectionError: simulated Decisions API outage\"], \"urgency\": null}",
@@ -42,18 +42,18 @@
  },
  "response": {
   "model": "gpt-6.1-sol",
-  "output_text": "{\"bank_request\":\"No request is being sent for Area Hospital, Rajahmundry (labour ward) because routing is HOLD_FOR_HUMAN following a Decisions API connection failure.\",\"officer_explanation\":\"The request specifies 2 units of O-negative needed now for ongoing post-partum haemorrhage, but the decision call failed and all candidates were held before per-bank checks; no reserve or priority verdicts were produced. The reported O-negative stock now/after dispatch is 12/10 units at Dr. Ysr-Jakkampudi Rammohan Rao Blood Centre, 6/4 at Government Teaching General Hospital Blood Centre, Rajahmundry, and 4/2 at Ntr Memorial Trust Blood Centre Rajamahendravaram; all are exact matches, with no substitution proposed. An officer must confirm before any request is sent.\",\"follow_up_question\":null}",
+  "output_text": "{\"bank_request\":\"No request is being sent because routing is HOLD_FOR_HUMAN following a Decisions API connection failure, and no bank was chosen.\",\"officer_explanation\":\"The request from Area Hospital, Rajahmundry (labour ward) is for 2 units of O-negative needed now for ongoing post-partum haemorrhage with massive transfusion protocol activated; routing was held before per-bank checks because the Decisions API call failed. The snapshot shows O-negative stock now/projected after dispatch of 12/10, 6/4 and 4/2 units at the three listed banks respectively; all are exact matches with no substitution, but no reserve or priority verdicts were produced. An officer must confirm before any request is sent.\",\"follow_up_question\":null}",
   "usage": {
    "input_tokens": 807,
    "input_tokens_details": {
     "cache_write_tokens": 0,
     "cached_tokens": 0
    },
-   "output_tokens": 190,
+   "output_tokens": 169,
    "output_tokens_details": {
     "reasoning_tokens": 0
    },
-   "total_tokens": 997
+   "total_tokens": 976
   }
  }
 }

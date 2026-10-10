@@ -1,6 +1,6 @@
 {
- "latency_ms": 144.2,
- "recorded_at": "2026-10-10T12:28:41",
+ "latency_ms": 144.5,
+ "recorded_at": "2026-10-10T12:44:30",
  "request": {
   "api": "decisions.create",
   "input": "Blood request c14 from a hospital.\nHospital note: \"2 units O+ crossmatched for elective knee replacement on Monday, patient O-positive.\"\nParsed by code from the note: blood group O+, units 2.",

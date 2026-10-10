@@ -1,6 +1,6 @@
 {
- "latency_ms": 126.6,
- "recorded_at": "2026-10-10T12:28:39",
+ "latency_ms": 169.1,
+ "recorded_at": "2026-10-10T12:44:29",
  "request": {
   "api": "decisions.create",
   "input": "Blood request c10 from a hospital: 1 units of O- packed red cells. Request urgency (judged earlier): urgent.\nHospital note: \"1 unit O-negative for neonatal exchange transfusion today, baby typed O-negative.\"\nCandidate bank: Government Teaching General Hospital Blood Centre, Rajahmundry.\nGroup that would be dispensed: O- (exact match).\nO- units at this bank now: 6. Units remaining after this dispatch: 5.\nUnits of O- already requested by pending orders at this bank: 6.\nPending orders at this bank for O-: 6u O-: Trauma theatre now: 24M road-traffic polytrauma with splenic rupture, typed O-negative, haemodynamically unstable. Massive transfusion protocol on standby; all 6 O-neg units earmarked for this patient.",

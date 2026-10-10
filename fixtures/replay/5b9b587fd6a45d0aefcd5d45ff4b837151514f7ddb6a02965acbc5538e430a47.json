@@ -1,6 +1,6 @@
 {
- "latency_ms": 170.9,
- "recorded_at": "2026-10-10T12:28:35",
+ "latency_ms": 137.0,
+ "recorded_at": "2026-10-10T12:44:26",
  "request": {
   "api": "decisions.create",
   "input": "Blood request c02 from a hospital: 4 units of O+ packed red cells. Request urgency (judged earlier): massive transfusion or life-threatening.\nHospital note: \"4 units O positive, MTP activated, 52M ruptured abdominal aortic aneurysm, typed O-positive.\"\nCandidate bank: Dr. Ysr-Jakkampudi Rammohan Rao Blood Centre.\nGroup that would be dispensed: O+ (exact match).\nO+ units at this bank now: 92. Units remaining after this dispatch: 88.\nUnits of O+ already requested by pending orders at this bank: 0.\nPending orders at this bank for O+: none",

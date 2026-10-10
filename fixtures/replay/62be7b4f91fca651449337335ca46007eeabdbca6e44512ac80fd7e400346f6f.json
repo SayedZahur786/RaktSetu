@@ -1,0 +1,59 @@
+{
+ "latency_ms": 5405.5,
+ "recorded_at": "2026-10-10T12:43:46",
+ "request": {
+  "api": "responses.create",
+  "input": "{\"chosen\": null, \"data_source\": \"snapshot e-RaktKosh, East Godavari, Andhra Pradesh, 2026-09-26T05:19:57\", \"other_candidates\": [{\"bank\": \"Dr. Ysr-Jakkampudi Rammohan Rao Blood Centre\", \"dispensed_group\": \"O+\", \"exact_match\": false, \"pending_at_bank\": \"none\", \"reasons\": [\"substitution permission uncertain (p=0.44)\"], \"status\": \"HOLD_FOR_HUMAN\", \"units_after_dispatch\": 82, \"units_now\": 92, \"verdicts\": {\"priority_check\": \"proceed (p=1.00)\", \"reserve_check\": \"safe (p=1.00)\", \"substitution_ok\": \"p(yes)=0.44\"}}, {\"bank\": \"Government Teaching General Hospital Blood Centre, Rajahmundry\", \"dispensed_group\": \"O+\", \"exact_match\": false, \"pending_at_bank\": \"none\", \"reasons\": [\"substitution permission uncertain (p=0.44)\"], \"status\": \"HOLD_FOR_HUMAN\", \"units_after_dispatch\": 65, \"units_now\": 75, \"verdicts\": {\"priority_check\": \"proceed (p=1.00)\", \"reserve_check\": \"safe (p=1.00)\", \"substitution_ok\": \"p(yes)=0.44\"}}, {\"bank\": \"Dhanwantani Voluntary Blood Bank\", \"dispensed_group\": \"O+\", \"exact_match\": false, \"pending_at_bank\": \"none\", \"reasons\": [\"substitution permission uncertain (p=0.44)\"], \"status\": \"HOLD_FOR_HUMAN\", \"units_after_dispatch\": 30, \"units_now\": 40, \"verdicts\": {\"priority_check\": \"proceed (p=1.00)\", \"reserve_check\": \"safe (p=1.00)\", \"substitution_ok\": \"p(yes)=0.44\"}}, {\"bank\": \"Ntr Memorial Trust Blood Centre Rajamahendravaram\", \"dispensed_group\": \"O+\", \"exact_match\": false, \"pending_at_bank\": \"none\", \"reasons\": [\"substitution permission uncertain (p=0.44)\"], \"status\": \"HOLD_FOR_HUMAN\", \"units_after_dispatch\": 20, \"units_now\": 30, \"verdicts\": {\"priority_check\": \"proceed (p=0.99)\", \"reserve_check\": \"safe (p=1.00)\", \"substitution_ok\": \"p(yes)=0.44\"}}], \"request\": {\"blood_group\": \"O-\", \"hospital\": \"Community Health Centre, Peddapuram\", \"id\": \"demo2\", \"note\": \"Standing weekly restock: 10 units O-negative. No active cases. Ward patients are all typed Rh-positive; we keep O-neg on the shelf out of habit.\", \"units\": 10}, \"status\": \"HOLD_FOR_HUMAN\", \"status_reasons\": [\"no candidate bank passed every check\"], \"urgency\": \"routine restock\"}",
+  "instructions": "You write for RaktSetu, a blood request router used by blood bank officers in India.\nThe routing decision below is FINAL. It was made by code from typed model judgments and fixed thresholds.\nYou cannot change it, add candidates, or second-guess it; you only explain it and draft text.\n\nReturn JSON with exactly these fields:\n- bank_request: a short, formal request to the chosen bank (requested group, units, urgency, requesting\n  hospital). If no bank was chosen, write one sentence saying no request is being sent and why.\n- officer_explanation: 2-3 sentences for the officer citing the verdicts and computed facts given\n  (stock now/after, reserve and priority verdicts, substitution if any). State that an officer must confirm.\n- follow_up_question: only if status is HOLD_FOR_HUMAN because the request note is missing or unclear\n  (ambiguous note, blood group or units not stated): the single question to ask the requesting hospital,\n  covering which blood group, how many units, and for what clinical reason. Otherwise null.\nPlain text inside each field. No markdown. Do not invent facts not present in the input.",
+  "model": "gpt-6.1-sol",
+  "reasoning": {
+   "effort": "low"
+  },
+  "text": {
+   "format": {
+    "name": "raktsetu_draft",
+    "schema": {
+     "additionalProperties": false,
+     "properties": {
+      "bank_request": {
+       "type": "string"
+      },
+      "follow_up_question": {
+       "type": [
+        "string",
+        "null"
+       ]
+      },
+      "officer_explanation": {
+       "type": "string"
+      }
+     },
+     "required": [
+      "bank_request",
+      "officer_explanation",
+      "follow_up_question"
+     ],
+     "type": "object"
+    },
+    "strict": true,
+    "type": "json_schema"
+   }
+  }
+ },
+ "response": {
+  "model": "gpt-6.1-sol",
+  "output_text": "{\"bank_request\":\"No request is being sent because no candidate bank passed every check; permission to substitute O+ for the requested 10 units of O- remains uncertain.\",\"officer_explanation\":\"For this routine restock request from Community Health Centre, Peddapuram, all four O+ candidates have safe reserve verdicts (p=1.00) and proceed priority verdicts (p=1.00 for the first three; p=0.99 for Ntr Memorial Trust), but substitution permission is uncertain (p(yes)=0.44), resulting in HOLD_FOR_HUMAN. Stock now/projected after dispatch is 92/82 units at Dr. Ysr-Jakkampudi Rammohan Rao Blood Centre, 75/65 at Government Teaching General Hospital Blood Centre, Rajahmundry, 40/30 at Dhanwantani Voluntary Blood Bank, and 30/20 at Ntr Memorial Trust Blood Centre Rajamahendravaram. An officer must confirm substitution permission before any request proceeds.\",\"follow_up_question\":null}",
+  "usage": {
+   "input_tokens": 963,
+   "input_tokens_details": {
+    "cache_write_tokens": 0,
+    "cached_tokens": 0
+   },
+   "output_tokens": 227,
+   "output_tokens_details": {
+    "reasoning_tokens": 0
+   },
+   "total_tokens": 1190
+  }
+ }
+}

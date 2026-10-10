@@ -84,7 +84,7 @@ async function confirmCand(rec, c, btn) {
   if (!officer) return;
   btn.disabled = true;
   const r = await fetch("/confirm", { method: "POST", headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ request_id: rec.request.id, bank: c.bank, blood_group: c.blood_group, officer }) });
+    body: JSON.stringify({ decision_id: rec.decision_id, bank: c.bank, blood_group: c.blood_group, officer }) });
   const body = await r.json();
   btn.replaceWith(el("span", { class: r.ok ? "RECOMMEND" : "err" }, r.ok ? `CONFIRMED by ${officer}. ${body.note}` : body.detail));
 }
@@ -112,7 +112,7 @@ function render(rec) {
     for (const c of rec.candidates) {
       const action = el("td");
       if (c.status === "RECOMMEND" || c.status === "HOLD_FOR_HUMAN") {
-        const b = el("button", {}, "Confirm");
+        const b = el("button", {}, c.status === "RECOMMEND" ? "Confirm" : "Override & confirm");
         b.onclick = () => confirmCand(rec, c, b);
         action.append(b);
       }

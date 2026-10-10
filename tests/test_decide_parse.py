@@ -67,10 +67,10 @@ def test_parse_malformed_raises(raw):
         decide.parse_decision(raw, QUESTIONS)
 
 
-def test_substitution_question_only_when_asked():
-    assert [q.name for q in decide.candidate_questions(None, "O-")] == ["reserve_check", "priority_check"]
-    qs = decide.candidate_questions("O+", "O-")
-    assert qs[-1].name == "substitution_ok" and "O+" in qs[-1].instructions
+def test_bank_questions_exclude_substitution():
+    assert [q.name for q in decide.candidate_questions()] == ["reserve_check", "priority_check"]
+    q = decide.substitution_question("O+", "O-")
+    assert q.name == "substitution_ok" and "O+" in q.instructions and "O-" in q.instructions
 
 
 def test_replay_round_trip_is_deterministic(tmp_path):

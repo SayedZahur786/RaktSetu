@@ -84,15 +84,17 @@ def test_no_stock_anywhere(policy):
 
 
 def test_compatible_substitute_used_when_exact_group_absent(policy):
-    rec = route(ScriptedDecider(urgency_verdict()), policy, note="3 units AB-negative for surgery")
+    all_groups = stock(*[(b.name, b.blood_group, b.units) for b in STOCK.banks],
+                       groups=("O-", "O+", "A-", "A+", "B-", "B+", "AB-", "AB+"))
+    rec = route(ScriptedDecider(urgency_verdict()), policy, note="3 units AB-negative for surgery", snapshot=all_groups)
     assert rec.status == "ROUTED" and rec.chosen.blood_group == "O-" and not rec.chosen.needs_permission
 
 
 def test_blocked_exact_group_falls_back_to_permitted_substitute(policy):
     def bank(text, names):
-        if "substitution_ok" in names:
+        if names == ["substitution_ok"]:
             return bank_verdict(subst=0.95)
-        return bank_verdict(safe=0.0, unsafe=1.0)
+        return bank_verdict(safe=0.0, unsafe=1.0) if "(exact match)" in text else bank_verdict()
     rec = route(ScriptedDecider(urgency_verdict(level=0), bank=bank), policy,
                 note="routine restock 5 units O-negative, ward patients typed Rh-positive")
     assert rec.status == "ROUTED"

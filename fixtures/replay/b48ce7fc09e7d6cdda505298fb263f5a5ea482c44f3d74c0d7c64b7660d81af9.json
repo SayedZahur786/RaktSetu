@@ -1,6 +1,6 @@
 {
- "latency_ms": 211.7,
- "recorded_at": "2026-10-10T12:25:21",
+ "latency_ms": 209.8,
+ "recorded_at": "2026-10-10T12:43:40",
  "request": {
   "api": "decisions.create",
   "input": "Blood request demo2 from Community Health Centre, Peddapuram.\nHospital note: \"Standing weekly restock: 10 units O-negative. No active cases. Ward patients are all typed Rh-positive; we keep O-neg on the shelf out of habit.\"\nParsed by code from the note: blood group O-, units 10.",

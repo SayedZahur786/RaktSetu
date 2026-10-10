@@ -1,6 +1,6 @@
 {
- "latency_ms": 148.9,
- "recorded_at": "2026-10-10T12:28:40",
+ "latency_ms": 124.8,
+ "recorded_at": "2026-10-10T12:44:30",
  "request": {
   "api": "decisions.create",
   "input": "Blood request c13 from a hospital: 4 units of O- packed red cells. Request urgency (judged earlier): urgent.\nHospital note: \"4 units O-negative for 45M upper GI bleed, typed O-negative, stable for now but Hb dropping.\"\nCandidate bank: Ntr Memorial Trust Blood Centre Rajamahendravaram.\nGroup that would be dispensed: O- (exact match).\nO- units at this bank now: 4. Units remaining after this dispatch: 0.\nUnits of O- already requested by pending orders at this bank: 0.\nPending orders at this bank for O-: none",

@@ -1,7 +1,8 @@
 """Pydantic models shared across module boundaries. No I/O, no provider wire formats."""
 from __future__ import annotations
 
-from typing import Literal
+import uuid
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field
 
@@ -9,6 +10,7 @@ BloodGroup = Literal["O-", "O+", "A-", "A+", "B-", "B+", "AB-", "AB+"]
 CandidateStatus = Literal["RECOMMEND", "HOLD_FOR_HUMAN", "BLOCKED", "NO_STOCK"]
 RequestStatus = Literal["ROUTED", "HOLD_FOR_HUMAN", "NO_STOCK"]
 AnswerKind = Literal["predicate", "choice", "score", "refusal"]
+Prob = Annotated[float, Field(ge=0, le=1, allow_inf_nan=False)]
 
 
 class Policy(BaseModel):
@@ -23,6 +25,7 @@ class Policy(BaseModel):
     substitution_min_p: float = Field(ge=0, le=1)
     substitution_block_p: float = Field(ge=0, le=1)
     min_units_after_dispatch: int = Field(ge=0)
+    hold_on_pending_shortfall: bool = True
     fail_mode: str = "closed"
     api_timeout_s: float = Field(gt=0)
 
@@ -61,10 +64,13 @@ class StockSnapshot(BaseModel):
     source: Literal["live", "snapshot"]
     fetched_at: str
     region: str
+    groups: list[BloodGroup] = Field(default_factory=list)  # groups actually fetched; others are unknown, not 0
+    fallback: bool = False                                  # live was requested but the snapshot was used
 
     @property
     def label(self) -> str:
-        return f"{self.source} e-RaktKosh, {self.region}, {self.fetched_at}"
+        note = " (LIVE FETCH FAILED, fallback)" if self.fallback else ""
+        return f"{self.source} e-RaktKosh, {self.region}, {self.fetched_at}{note}"
 
 
 class QuestionSpec(BaseModel):
@@ -82,11 +88,11 @@ class Answer(BaseModel):
 
     name: str
     kind: AnswerKind
-    probability: float | None = None              # predicate
+    probability: Prob | None = None               # predicate
     choice: str | None = None                     # choice
-    probabilities: dict[str, float] = Field(default_factory=dict)  # choice values / score labels
-    score: float | None = None                    # score: weighted level index
-    confidence: float | None = None               # choice, score
+    probabilities: dict[str, Prob] = Field(default_factory=dict)  # choice values / score labels
+    score: float | None = Field(default=None, ge=0, allow_inf_nan=False)  # score: weighted level index
+    confidence: Prob | None = None                # choice, score
 
 
 class Verdict(BaseModel):
@@ -106,6 +112,7 @@ class Candidate(BaseModel):
     needs_permission: bool = False                # substitute valid only if the note permits it
     units_now: int
     units_after: int
+    pending_units: int = 0                        # units already promised to pending orders at this bank
     pending_summary: str
     distance_km: float | None = None
     verdict: Verdict | None = None
@@ -124,6 +131,7 @@ class Draft(BaseModel):
 
 
 class Recommendation(BaseModel):
+    decision_id: str = Field(default_factory=lambda: f"dec-{uuid.uuid4().hex[:12]}")  # unique per routing run
     request: Request
     status: RequestStatus
     reasons: list[str] = Field(default_factory=list)

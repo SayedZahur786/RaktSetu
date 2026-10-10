@@ -1,6 +1,6 @@
 {
- "latency_ms": 200.4,
- "recorded_at": "2026-10-10T12:28:42",
+ "latency_ms": 182.4,
+ "recorded_at": "2026-10-10T12:44:31",
  "request": {
   "api": "decisions.create",
   "input": "Blood request c18 from a hospital.\nHospital note: \"Scheduled chemotherapy support on Friday: 1 unit O+ for 58M typed O-positive.\"\nParsed by code from the note: blood group O+, units 1.",

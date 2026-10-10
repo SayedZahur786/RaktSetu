@@ -1,6 +1,6 @@
 {
- "latency_ms": 146.4,
- "recorded_at": "2026-10-10T12:28:37",
+ "latency_ms": 119.5,
+ "recorded_at": "2026-10-10T12:44:28",
  "request": {
   "api": "decisions.create",
   "input": "Blood request c06 from a hospital.\nHospital note: \"3 units B-negative, active GI bleed, haemoglobin 5, patient typed B-negative.\"\nParsed by code from the note: blood group B-, units 3.",

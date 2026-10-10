@@ -1,6 +1,6 @@
 {
- "latency_ms": 145.0,
- "recorded_at": "2026-10-10T12:28:45",
+ "latency_ms": 117.3,
+ "recorded_at": "2026-10-10T12:44:35",
  "request": {
   "api": "decisions.create",
   "input": "Blood request c28 from a hospital.\nHospital note: \"2 units of blood, patient bleeding\"\nParsed by code from the note: blood group NOT STATED, units 2.",

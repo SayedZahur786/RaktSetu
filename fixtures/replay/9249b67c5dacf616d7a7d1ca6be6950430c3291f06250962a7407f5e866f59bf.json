@@ -1,6 +1,6 @@
 {
- "latency_ms": 213.7,
- "recorded_at": "2026-10-10T12:28:39",
+ "latency_ms": 190.8,
+ "recorded_at": "2026-10-10T12:44:29",
  "request": {
   "api": "decisions.create",
   "input": "Blood request c09 from a hospital: 2 units of O+ packed red cells. Request urgency (judged earlier): urgent.\nHospital note: \"2 units O+ for 67F with symptomatic anaemia, Hb 6.1, transfuse today, typed O-positive.\"\nCandidate bank: Sanjeevani Voluntary Blood Centre Rajamahendravaram.\nGroup that would be dispensed: O+ (exact match).\nO+ units at this bank now: 13. Units remaining after this dispatch: 11.\nUnits of O+ already requested by pending orders at this bank: 0.\nPending orders at this bank for O+: none",

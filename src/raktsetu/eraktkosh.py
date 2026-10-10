@@ -46,7 +46,8 @@ def load_snapshot(path: Path = SNAPSHOT_FILE) -> StockSnapshot:
     snap = json.loads(path.read_text())
     banks = [b for raw in snap["banks"]
              if (b := _bank_from_label(raw["name"], raw.get("category"), raw["stock"], raw.get("last_updated")))]
-    return StockSnapshot(banks=banks, source="snapshot", fetched_at=snap["fetched_at"], region=SNAPSHOT_REGION)
+    return StockSnapshot(banks=banks, source="snapshot", fetched_at=snap["fetched_at"], region=SNAPSHOT_REGION,
+                         groups=sorted({b.blood_group for b in banks}))
 
 
 def fetch_live(state_code: str, district_code: str, session: requests.Session | None = None) -> StockSnapshot:
@@ -71,12 +72,15 @@ def fetch_live(state_code: str, district_code: str, session: requests.Session | 
             if not region and e.get("hospitaladd"):
                 region = ", ".join(e["hospitaladd"].split(", ")[-2:])
     return StockSnapshot(banks=banks, source="live", fetched_at=time.strftime("%Y-%m-%d %H:%M"),
-                         region=region or f"state {state_code} / district {district_code}")
+                         region=region or f"state {state_code} / district {district_code}", groups=list(GROUP_IDS))
 
 
 def load_stock(prefer_live: bool, state_code: str = DEFAULT_STATE_CODE,
                district_code: str = DEFAULT_DISTRICT_CODE) -> StockSnapshot:
-    """Live stock when asked and available, otherwise the snapshot. Never raises for live failures."""
+    """Live stock when asked and available, otherwise the snapshot flagged `fallback=True`.
+
+    Never raises for live failures. The router refuses to RECOMMEND on fallback stock.
+    """
     if prefer_live:
         try:
             snap = fetch_live(state_code, district_code)
@@ -86,4 +90,5 @@ def load_stock(prefer_live: bool, state_code: str = DEFAULT_STATE_CODE,
                         state_code, district_code)
         except (requests.RequestException, ValueError) as ex:
             log.warning("e-RaktKosh live fetch failed (%s: %s); using snapshot", type(ex).__name__, ex)
+        return load_snapshot().model_copy(update={"fallback": True})
     return load_snapshot()

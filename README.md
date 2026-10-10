@@ -14,7 +14,7 @@ In an emergency, hospital staff phone blood banks one by one to find compatible 
 
 Blood bank officers and hospital transfusion services. RaktSetu replaces phone calls and spreadsheet checks with a ranked, explained recommendation that the officer confirms or rejects.
 
-Cost per request: 6.9 Decisions API calls and about 3,450 input tokens on average, which is **$0.000345 per request** at $0.10 per 1M input tokens. The writer (GPT-6.1 Sol) is one more call per request and is not included in that figure. Numbers come from [evals/results.md](evals/results.md).
+Cost per request: 5.2 Decisions API calls and about 2,360 input tokens on average, which is **$0.000236 per request** at $0.10 per 1M input tokens. The writer (GPT-6.1 Sol) is one more call per request and is not included in that figure. Numbers come from [evals/results.md](evals/results.md).
 
 ## Quickstart (no API key needed)
 
@@ -42,20 +42,31 @@ From [evals/results.md](evals/results.md): 30 synthetic, hand-labelled requests 
 | Cases | 30 |
 | Urgency accuracy (exact band of 4) | 97% |
 | Urgency within one band | 100% |
-| Status accuracy | 100% |
+| Status accuracy | 97% (29/30) |
 | **Unsafe recommendations** | **0** |
-| HOLD_FOR_HUMAN rate | 33% |
-| p50 Decisions API call latency | 154.9 ms |
-| Decisions API cost per request | $0.000345 |
+| HOLD_FOR_HUMAN rate | 53% |
+| p50 Decisions API call latency | 165.8 ms |
+| Decisions API cost per request | $0.000236 |
 
-Policy history: the first live eval run produced **1 unsafe recommendation** (case c13). It routed 4 O-negative units to a bank holding exactly 4. The reserve check judged that "safe" because no pending order was described there, but it would have left the bank with no O-negative at all. We added `min_units_after_dispatch: 1` to [policy.yaml](policy.yaml): a dispatch that would empty a bank goes to the officer. c13's label was not changed. The table above is the run after that change.
+The one miss is c19, a restock note saying the ward patients are Rh-positive. We labelled it ROUTED (O+ substitute), but the model judged the substitution uncertain and the request held. That error is in the safe direction.
+
+How the numbers changed, in order:
+
+1. **Unsafe c13.** The first live run had 1 unsafe recommendation: c13 routed 4 O-negative units to a bank holding exactly 4. Its reserve check said "safe" because no pending order was described there, but the dispatch would have emptied the bank. We added `min_units_after_dispatch: 1` to [policy.yaml](policy.yaml). c13's label was not changed.
+2. **Whole-branch code review.** Fixes:
+   - probabilities that are NaN or outside [0, 1] are now rejected;
+   - snapshot-fallback stock holds instead of routing;
+   - an ambiguous unit count ("1-2 units") is no longer guessed;
+   - code checks that a dispatch does not leave less than the pending orders at that bank already need;
+   - `substitution_ok` is asked once per request, not once per bank.
+3. **Five cases relabelled.** The review also found that A, B and AB requests were routed to O substitutes only because e-RaktKosh stock for those groups is never fetched. RaktSetu now holds them for the officer instead. Cases c06, c07, c08, c12 and c17 were relabelled from ROUTED to HOLD_FOR_HUMAN for that scope change. The model answers themselves played no part in the relabel.
 
 Demo scenarios ([data/demo_requests.json](data/demo_requests.json), `python -m raktsetu demo`):
 
 | # | Scenario | Result |
 |---|---|---|
-| 1 | Massive transfusion, 2 units O-neg | Government Teaching General Hospital **BLOCKED**: reserve unsafe, because its 6 O-neg are earmarked for a trauma case in theatre. NTR Memorial **RECOMMEND** (4 → 2). |
-| 2 | Routine restock, 10 units O-neg | The only bank with 10 O-neg is **BLOCKED**: reserve unsafe and priority defer, with 8 units reserved for tomorrow's surgery. The note says the ward patients are Rh-positive, so `substitution_ok` approves **O+**, which is routed. |
+| 1 | Massive transfusion, 2 units O-neg | Government Teaching General Hospital **BLOCKED**: reserve unsafe, plus the code check that 4 units would be left against 6 pending for a trauma case in theatre. NTR Memorial **RECOMMEND** (4 → 2). |
+| 2 | Routine restock, 10 units O-neg | The only bank with 10 O-neg is **BLOCKED**: reserve unsafe and priority defer, with 8 units reserved for tomorrow's surgery. The note says the ward patients are Rh-positive, but `substitution_ok` returns p=0.44, so every O+ bank is **HOLD_FOR_HUMAN** with that one shared value. Earlier, when the question was asked per bank, the same note scored anywhere from 0.51 to 0.96 and the highest-scoring bank got routed; asking once removes that best-of-N effect. The officer decides. |
 | 3 | "need blood asap pls" | **HOLD_FOR_HUMAN**. Sol writes the follow-up question: which group, how many units, what for. |
 | 4 | Decisions API outage | **HOLD_FOR_HUMAN** for every bank. The audit log records the failure reason. |
 
@@ -66,14 +77,15 @@ Demo scenarios ([data/demo_requests.json](data/demo_requests.json), `python -m r
      → e-RaktKosh stock, live or snapshot (eraktkosh.py)
      → Decisions API, request: urgency (score) + note_ambiguous (predicate)
      → candidate banks with enough stock; units after dispatch (code)
+     → groups e-RaktKosh stock is not fetched for → HOLD (unknown is not zero)
      → Decisions API, one call per bank, concurrent: reserve_check + priority_check (choice)
-     → if no exact-group bank passes: compatible substitutes; Rh-positive substitutes also ask substitution_ok (predicate)
+     → if no exact-group bank passes: compatible substitutes; Rh-positive substitutes need substitution_ok (predicate, asked once per request)
      → policy.yaml thresholds → RECOMMEND / HOLD_FOR_HUMAN / BLOCKED / NO_STOCK (policy.py, code)
      → ranking (code)
      → GPT-6.1 Sol writes the bank request, officer explanation and follow-up question (writer.py)
      → officer confirms (api.py /confirm) → out/audit.jsonl
 
-Code does all arithmetic: stock now, stock after dispatch, units already pending, ABO/Rh compatibility. The model receives those facts as text and answers typed questions ([src/raktsetu/router.py](src/raktsetu/router.py), `candidate_facts`).
+Code does all arithmetic and enforces the hard limits itself: stock now, stock after dispatch, units already pending (a shortfall holds whatever the model says), never emptying a bank, ABO/Rh compatibility. The model receives those facts as text and answers typed questions ([src/raktsetu/router.py](src/raktsetu/router.py), `candidate_facts`).
 
 ## Built on OpenAI
 
@@ -88,8 +100,8 @@ Code does all arithmetic: stock now, stock after dispatch, units already pending
 
 ## Safety
 
-- **Fails closed.** Any API error, timeout, refusal, missing answer, malformed response or low probability ends in `HOLD_FOR_HUMAN`, never `RECOMMEND`. See [src/raktsetu/policy.py](src/raktsetu/policy.py); tests in [tests/test_router_failclosed.py](tests/test_router_failclosed.py) and [tests/test_policy.py](tests/test_policy.py).
-- **No automatic dispatch.** Even a `ROUTED` result needs an officer. `/confirm` only appends `CONFIRMED` to `out/audit.jsonl`, and only for a bank that the server itself returned as `RECOMMEND` or `HOLD_FOR_HUMAN` ([src/raktsetu/api.py](src/raktsetu/api.py)).
+- **Fails closed.** Any API error, timeout, refusal, missing answer, malformed or out-of-range number, low probability, or a failed live e-RaktKosh fetch (snapshot fallback) ends in `HOLD_FOR_HUMAN`, never `RECOMMEND`. Error text is scrubbed of key-like strings before it is logged. See [src/raktsetu/policy.py](src/raktsetu/policy.py); tests in [tests/test_router_failclosed.py](tests/test_router_failclosed.py), [tests/test_policy.py](tests/test_policy.py) and [tests/test_hardening.py](tests/test_hardening.py).
+- **No automatic dispatch.** Even a `ROUTED` result needs an officer. `/confirm` only appends `CONFIRMED` to `out/audit.jsonl`, and only for a bank that the server itself returned as `RECOMMEND` or `HOLD_FOR_HUMAN`. Confirming a held bank is labelled an override in the UI and recorded with `override: true` plus the hold reasons. Each routing run has its own `decision_id` ([src/raktsetu/api.py](src/raktsetu/api.py)).
 - **Blocked banks stay visible,** with the verdict that blocked them.
 - **Every threshold** lives in [policy.yaml](policy.yaml).
 - **Every decision is audited:** request, each candidate, raw probabilities, status, reasons, data source, model ids and latency ([src/raktsetu/audit.py](src/raktsetu/audit.py)).
@@ -98,9 +110,10 @@ Code does all arithmetic: stock now, stock after dispatch, units already pending
 ## Limitations
 
 - **Pending orders are synthetic.** They come from [data/demo_requests.json](data/demo_requests.json). e-RaktKosh publishes stock, not reservations, so a real deployment needs the bank's own order book.
-- **Coverage is limited.** Only packed red cells, O-negative and O-positive, are fetched. These are the e-RaktKosh group ids verified so far. The default district is East Godavari, Andhra Pradesh, matching the snapshot. Other districts can be tried by setting `ERAKTKOSH_STATE` / `ERAKTKOSH_DISTRICT` (numeric e-RaktKosh codes). Coverage of any other district, including Bengaluru, is not verified.
+- **Coverage is limited.** Only packed red cells, O-negative and O-positive, are fetched; these are the e-RaktKosh group ids verified so far. Requests for any other group are held for the officer, not routed. The default district is East Godavari, Andhra Pradesh, matching the snapshot. Other districts can be tried by setting `ERAKTKOSH_STATE` / `ERAKTKOSH_DISTRICT` (numeric e-RaktKosh codes). Coverage of any other district, including Bengaluru, is not verified.
 - **No locations.** e-RaktKosh returns no coordinates, so ranking never uses distance in practice.
-- **`substitution_ok` varies between banks.** It judges the note, but it is asked inside each bank's call, so the same note scored between 0.51 and 0.96 across banks in demo 2. Policy holds the low-confidence banks, so this is safe, but asking it once per request would be more consistent.
+- **Substitution judgments are conservative and noisy.** Demo 2's note scored p=0.44 on the recorded run, and 0.77–0.88 in earlier probes. Uncertain cases hold, so the officer decides.
+- **No authentication on the console.** The officer name is free text. A deployment needs real sign-in.
 - **The eval set is small:** 30 cases, synthetic, labelled by the authors. It shows the gates behave as intended. It is not a clinical validation.
 - **Not a medical device.** RaktSetu does not replace crossmatching, blood bank SOPs or an officer's judgment.
 

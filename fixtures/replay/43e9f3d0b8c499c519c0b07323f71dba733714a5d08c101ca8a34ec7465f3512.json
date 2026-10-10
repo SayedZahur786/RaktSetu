@@ -1,6 +1,6 @@
 {
- "latency_ms": 133.6,
- "recorded_at": "2026-10-10T12:28:38",
+ "latency_ms": 111.5,
+ "recorded_at": "2026-10-10T12:44:28",
  "request": {
   "api": "decisions.create",
   "input": "Blood request c07 from a hospital.\nHospital note: \"MTP: 4 units A positive, 30F placental abruption, typed A+.\"\nParsed by code from the note: blood group A+, units 4.",

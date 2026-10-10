@@ -1,6 +1,6 @@
 {
- "latency_ms": 185.8,
- "recorded_at": "2026-10-10T12:28:39",
+ "latency_ms": 179.0,
+ "recorded_at": "2026-10-10T12:44:29",
  "request": {
   "api": "decisions.create",
   "input": "Blood request c10 from a hospital: 1 units of O- packed red cells. Request urgency (judged earlier): urgent.\nHospital note: \"1 unit O-negative for neonatal exchange transfusion today, baby typed O-negative.\"\nCandidate bank: Gsl Medical College And General Hospital Blood Centre.\nGroup that would be dispensed: O- (exact match).\nO- units at this bank now: 1. Units remaining after this dispatch: 0.\nUnits of O- already requested by pending orders at this bank: 0.\nPending orders at this bank for O-: none",

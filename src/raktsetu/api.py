@@ -38,7 +38,7 @@ class RouteBody(BaseModel):
 
 
 class ConfirmBody(BaseModel):
-    request_id: str
+    decision_id: str
     bank: str
     blood_group: str
     officer: str = Field(min_length=1, max_length=100)
@@ -83,7 +83,7 @@ def create_app(router_factory: Callable[[bool], Router] = lambda outage: build_r
         except FixtureMissing as ex:
             raise HTTPException(status_code=503, detail=f"replay mode: {ex}") from ex
         with recent_lock:
-            recent[rec.request.id] = rec
+            recent[rec.decision_id] = rec
             while len(recent) > MAX_REMEMBERED:
                 recent.popitem(last=False)
         return rec
@@ -91,16 +91,19 @@ def create_app(router_factory: Callable[[bool], Router] = lambda outage: build_r
     @app.post("/confirm")
     def confirm(body: ConfirmBody) -> dict[str, str]:
         with recent_lock:
-            rec = recent.get(body.request_id)
+            rec = recent.get(body.decision_id)
         if rec is None:
-            raise HTTPException(status_code=404, detail="unknown request_id")
+            raise HTTPException(status_code=404, detail="unknown decision_id")
         cand = next((c for c in rec.candidates if c.bank == body.bank and c.blood_group == body.blood_group), None)
         if cand is None or cand.status not in CONFIRMABLE:
             raise HTTPException(status_code=409, detail="only RECOMMEND or HOLD_FOR_HUMAN candidates can be confirmed")
-        assert rec.request.units is not None  # candidates only exist when units were parsed
-        audit_log.record_confirmation(rec.request.id, cand.bank, cand.blood_group, rec.request.units, body.officer)
-        log.info("officer confirmed %s -> %s", rec.request.id, cand.bank)
-        return {"status": "CONFIRMED", "note": "Recorded in the audit log only. Nothing has been dispatched."}
+        if rec.request.units is None:  # unreachable: candidates only exist when units were parsed
+            raise HTTPException(status_code=409, detail="request has no unit count")
+        audit_log.record_confirmation(rec.decision_id, rec.request.id, cand.bank, cand.blood_group, rec.request.units,
+                                      body.officer, cand.status, cand.reasons)
+        log.info("officer confirmed %s (%s) -> %s", rec.decision_id, cand.status, cand.bank)
+        override = " Recorded as an override of HOLD_FOR_HUMAN." if cand.status != "RECOMMEND" else ""
+        return {"status": "CONFIRMED", "note": f"Recorded in the audit log only. Nothing has been dispatched.{override}"}
 
     return app
 

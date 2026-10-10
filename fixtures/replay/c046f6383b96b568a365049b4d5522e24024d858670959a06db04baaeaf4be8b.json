@@ -1,6 +1,6 @@
 {
- "latency_ms": 131.8,
- "recorded_at": "2026-10-10T12:28:44",
+ "latency_ms": 124.5,
+ "recorded_at": "2026-10-10T12:44:33",
  "request": {
   "api": "decisions.create",
   "input": "Blood request c22 from a hospital.\nHospital note: \"Standing order: 8 units O+ for the district hospital shelf.\"\nParsed by code from the note: blood group O+, units 8.",

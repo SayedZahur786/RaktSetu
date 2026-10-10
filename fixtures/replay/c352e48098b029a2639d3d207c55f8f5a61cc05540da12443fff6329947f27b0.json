@@ -1,6 +1,6 @@
 {
- "latency_ms": 163.3,
- "recorded_at": "2026-10-10T12:28:41",
+ "latency_ms": 188.7,
+ "recorded_at": "2026-10-10T12:44:31",
  "request": {
   "api": "decisions.create",
   "input": "Blood request c16 from a hospital.\nHospital note: \"Elective hysterectomy next week, reserve 2 units O-negative, patient typed O-negative.\"\nParsed by code from the note: blood group O-, units 2.",

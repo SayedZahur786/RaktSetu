@@ -1,6 +1,6 @@
 {
- "latency_ms": 133.9,
- "recorded_at": "2026-10-10T12:28:39",
+ "latency_ms": 117.4,
+ "recorded_at": "2026-10-10T12:44:29",
  "request": {
   "api": "decisions.create",
   "input": "Blood request c11 from a hospital.\nHospital note: \"3 units O+ for sickle cell crisis, 19M typed O+, transfuse within hours.\"\nParsed by code from the note: blood group O+, units 3.",

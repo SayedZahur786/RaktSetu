@@ -1,6 +1,6 @@
 {
- "latency_ms": 148.0,
- "recorded_at": "2026-10-10T12:28:38",
+ "latency_ms": 106.5,
+ "recorded_at": "2026-10-10T12:44:28",
  "request": {
   "api": "decisions.create",
   "input": "Blood request c09 from a hospital.\nHospital note: \"2 units O+ for 67F with symptomatic anaemia, Hb 6.1, transfuse today, typed O-positive.\"\nParsed by code from the note: blood group O+, units 2.",

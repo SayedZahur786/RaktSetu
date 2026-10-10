@@ -1,6 +1,6 @@
 {
- "latency_ms": 130.4,
- "recorded_at": "2026-10-10T12:28:40",
+ "latency_ms": 119.9,
+ "recorded_at": "2026-10-10T12:44:29",
  "request": {
   "api": "decisions.create",
   "input": "Blood request c12 from a hospital.\nHospital note: \"2 units B+ for dengue with bleeding, platelets low and Hb falling, patient B+.\"\nParsed by code from the note: blood group B+, units 2.",

@@ -1,6 +1,6 @@
 {
- "latency_ms": 140.7,
- "recorded_at": "2026-10-10T12:28:41",
+ "latency_ms": 113.8,
+ "recorded_at": "2026-10-10T12:44:30",
  "request": {
   "api": "decisions.create",
   "input": "Blood request c15 from a hospital.\nHospital note: \"Planned thalassaemia day-care transfusion next Tuesday: 2 units O+, child typed O-positive.\"\nParsed by code from the note: blood group O+, units 2.",

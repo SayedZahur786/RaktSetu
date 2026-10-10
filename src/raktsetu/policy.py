@@ -55,10 +55,11 @@ def request_gate(verdict: Verdict | None, policy: Policy) -> tuple[bool, list[st
 
 
 def candidate_status(verdict: Verdict | None, needs_permission: bool, policy: Policy,
-                     units_after: int | None = None) -> tuple[CandidateStatus, list[str]]:
+                     units_after: int | None = None, pending_units: int = 0) -> tuple[CandidateStatus, list[str]]:
     """Status for one bank with enough stock. BLOCKED wins over HOLD; RECOMMEND needs every check to pass.
 
-    `units_after` is the code-computed stock left at the bank; below the policy floor it holds.
+    `units_after` and `pending_units` are code-computed. Leaving less than the policy floor, or
+    less than pending orders already need, holds regardless of the model's verdict.
     """
     if verdict is None:
         return "HOLD_FOR_HUMAN", ["not judged"]
@@ -106,6 +107,9 @@ def candidate_status(verdict: Verdict | None, needs_permission: bool, policy: Po
     if units_after is not None and units_after < policy.min_units_after_dispatch:
         hold.append(f"dispatch would empty this bank ({units_after} units left, floor "
                     f"{policy.min_units_after_dispatch})")
+
+    if policy.hold_on_pending_shortfall and units_after is not None and units_after < pending_units:
+        hold.insert(0, f"{units_after} units left but {pending_units} already pending at this bank")
 
     if blocked:
         return "BLOCKED", blocked + hold

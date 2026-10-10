@@ -1,6 +1,6 @@
 {
- "latency_ms": 400.8,
- "recorded_at": "2026-10-10T12:28:34",
+ "latency_ms": 265.8,
+ "recorded_at": "2026-10-10T12:44:26",
  "request": {
   "api": "decisions.create",
   "input": "Blood request c01 from a hospital.\nHospital note: \"2 units O-negative now. Massive transfusion protocol: 29F post-partum haemorrhage, typed O-negative, still bleeding.\"\nParsed by code from the note: blood group O-, units 2.",

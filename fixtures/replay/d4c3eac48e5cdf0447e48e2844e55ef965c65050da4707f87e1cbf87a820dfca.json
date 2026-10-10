@@ -1,6 +1,6 @@
 {
- "latency_ms": 168.7,
- "recorded_at": "2026-10-10T12:28:36",
+ "latency_ms": 119.7,
+ "recorded_at": "2026-10-10T12:44:27",
  "request": {
   "api": "decisions.create",
   "input": "Blood request c04 from a hospital.\nHospital note: \"2 units O-negative, emergency: 8-year-old with splenic laceration, typed O-negative, actively bleeding.\"\nParsed by code from the note: blood group O-, units 2.",

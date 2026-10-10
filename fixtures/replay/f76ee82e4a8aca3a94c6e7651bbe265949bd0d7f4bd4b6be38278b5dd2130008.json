@@ -1,6 +1,6 @@
 {
- "latency_ms": 116.9,
- "recorded_at": "2026-10-10T12:28:38",
+ "latency_ms": 119.1,
+ "recorded_at": "2026-10-10T12:44:28",
  "request": {
   "api": "decisions.create",
   "input": "Blood request c08 from a hospital.\nHospital note: \"2 units AB+ urgently, massive haemorrhage during surgery, patient AB positive.\"\nParsed by code from the note: blood group AB+, units 2.",

@@ -1,6 +1,6 @@
 {
- "latency_ms": 129.0,
- "recorded_at": "2026-10-10T12:28:45",
+ "latency_ms": 200.7,
+ "recorded_at": "2026-10-10T12:44:35",
  "request": {
   "api": "decisions.create",
   "input": "Blood request c25 from a hospital.\nHospital note: \"need blood asap pls\"\nParsed by code from the note: blood group NOT STATED, units NOT STATED.",

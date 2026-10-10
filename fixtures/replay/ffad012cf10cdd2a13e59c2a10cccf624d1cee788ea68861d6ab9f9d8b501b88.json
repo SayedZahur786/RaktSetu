@@ -1,6 +1,6 @@
 {
- "latency_ms": 4251.2,
- "recorded_at": "2026-10-10T12:26:11",
+ "latency_ms": 4297.7,
+ "recorded_at": "2026-10-10T12:44:10",
  "request": {
   "api": "responses.create",
   "input": "{\"chosen\": null, \"data_source\": \"snapshot e-RaktKosh, East Godavari, Andhra Pradesh, 2026-09-26T05:19:57\", \"other_candidates\": [], \"request\": {\"blood_group\": null, \"hospital\": \"Unknown clinic\", \"id\": \"demo3\", \"note\": \"need blood asap pls\", \"units\": null}, \"status\": \"HOLD_FOR_HUMAN\", \"status_reasons\": [\"decision call failed: ConnectionError: simulated Decisions API outage\", \"blood group not stated (or more than one) in the note\", \"number of units not stated in the note\"], \"urgency\": null}",
@@ -42,18 +42,18 @@
  },
  "response": {
   "model": "gpt-6.1-sol",
-  "output_text": "{\"bank_request\":\"No request is being sent because routing is on hold following a decision API connection failure, and the blood group and number of units are not stated.\",\"officer_explanation\":\"The final status is HOLD_FOR_HUMAN, with no bank chosen because the decision call failed and the note does not specify a blood group or unit count. Stock now and after allocation, reserve and priority verdicts, and substitution details are not available; an officer must confirm the request details before proceeding.\",\"follow_up_question\":\"Which blood group is required, how many units are needed, and for what clinical reason?\"}",
+  "output_text": "{\"bank_request\":\"No request is being sent because routing is on hold following a Decisions API connection failure and the request note does not state the blood group or number of units.\",\"officer_explanation\":\"The final status is HOLD_FOR_HUMAN, with no bank chosen: the decision call failed due to a simulated Decisions API outage, and the note lacks a blood group and unit count. Stock now and after, reserve and priority verdicts, and substitution details are not available; an officer must confirm the request details before proceeding.\",\"follow_up_question\":\"Which blood group is required, how many units are needed, and for what clinical reason?\"}",
   "usage": {
    "input_tokens": 442,
    "input_tokens_details": {
     "cache_write_tokens": 0,
     "cached_tokens": 0
    },
-   "output_tokens": 134,
+   "output_tokens": 141,
    "output_tokens_details": {
     "reasoning_tokens": 0
    },
-   "total_tokens": 576
+   "total_tokens": 583
   }
  }
 }

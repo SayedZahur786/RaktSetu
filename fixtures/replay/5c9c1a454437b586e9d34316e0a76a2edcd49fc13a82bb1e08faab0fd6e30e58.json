@@ -1,6 +1,6 @@
 {
- "latency_ms": 143.8,
- "recorded_at": "2026-10-10T12:28:42",
+ "latency_ms": 156.5,
+ "recorded_at": "2026-10-10T12:44:32",
  "request": {
   "api": "decisions.create",
   "input": "Blood request c18 from a hospital: 1 units of O+ packed red cells. Request urgency (judged earlier): planned / elective.\nHospital note: \"Scheduled chemotherapy support on Friday: 1 unit O+ for 58M typed O-positive.\"\nCandidate bank: Ntr Memorial Trust Blood Centre Rajamahendravaram.\nGroup that would be dispensed: O+ (exact match).\nO+ units at this bank now: 30. Units remaining after this dispatch: 29.\nUnits of O+ already requested by pending orders at this bank: 0.\nPending orders at this bank for O+: none",

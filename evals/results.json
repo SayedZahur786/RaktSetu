@@ -3,13 +3,13 @@
   "cases": 30,
   "urgency_accuracy": 0.9666666666666667,
   "urgency_within_one_band": 1.0,
-  "status_accuracy": 1.0,
+  "status_accuracy": 0.9666666666666667,
   "unsafe_recommendations": 0,
-  "hold_rate": 0.3333333333333333,
-  "p50_decision_call_latency_ms": 154.9,
-  "mean_decision_calls_per_request": 6.9,
-  "mean_input_tokens_per_request": 3450,
-  "cost_per_request_usd": 0.000345,
+  "hold_rate": 0.5333333333333333,
+  "p50_decision_call_latency_ms": 165.8,
+  "mean_decision_calls_per_request": 5.23,
+  "mean_input_tokens_per_request": 2360,
+  "cost_per_request_usd": 0.000236,
   "mode": "replay",
   "run_seconds": 0.0
  },
@@ -26,10 +26,10 @@
    "decision_calls": 4,
    "input_tokens": 1927,
    "latencies_ms": [
-    400.8,
-    498.0,
-    163.8,
-    244.2
+    265.8,
+    269.8,
+    252.3,
+    276.3
    ],
    "reasons": []
   },
@@ -45,14 +45,14 @@
    "decision_calls": 8,
    "input_tokens": 3618,
    "latencies_ms": [
-    120.2,
-    170.9,
-    170.2,
-    201.0,
-    1276.3,
-    244.3,
-    267.1,
-    348.6
+    137.9,
+    137.0,
+    666.3,
+    167.1,
+    257.4,
+    128.5,
+    232.7,
+    261.6
    ],
    "reasons": []
   },
@@ -68,14 +68,14 @@
    "decision_calls": 8,
    "input_tokens": 3602,
    "latencies_ms": [
-    142.5,
-    193.6,
-    194.2,
-    194.9,
-    194.0,
-    189.2,
-    190.9,
-    206.5
+    116.4,
+    136.1,
+    177.8,
+    173.5,
+    161.0,
+    146.8,
+    166.7,
+    123.4
    ],
    "reasons": []
   },
@@ -91,10 +91,10 @@
    "decision_calls": 4,
    "input_tokens": 1915,
    "latencies_ms": [
-    168.7,
-    135.0,
-    170.1,
-    144.2
+    119.7,
+    143.4,
+    174.6,
+    132.6
    ],
    "reasons": []
   },
@@ -108,18 +108,18 @@
    "chosen": null,
    "unsafe": false,
    "decision_calls": 10,
-   "input_tokens": 5824,
+   "input_tokens": 4599,
    "latencies_ms": [
-    159.9,
-    171.0,
-    169.5,
-    176.2,
-    172.1,
-    125.6,
-    147.7,
-    120.1,
-    221.4,
-    184.2
+    146.4,
+    131.3,
+    174.4,
+    136.1,
+    130.5,
+    139.6,
+    121.3,
+    144.2,
+    160.2,
+    128.7
    ],
    "reasons": [
     "no candidate bank passed every check"
@@ -128,80 +128,56 @@
   {
    "id": "c06",
    "note": "3 units B-negative, active GI bleed, haemoglobin 5, patient typed B-negative.",
-   "expected_status": "ROUTED",
-   "status": "ROUTED",
+   "expected_status": "HOLD_FOR_HUMAN",
+   "status": "HOLD_FOR_HUMAN",
    "expected_urgency_band": 3,
    "urgency_band": 3,
-   "chosen": "Ntr Memorial Trust Blood Centre Rajamahendravaram (O-)",
+   "chosen": null,
    "unsafe": false,
-   "decision_calls": 11,
-   "input_tokens": 6296,
+   "decision_calls": 1,
+   "input_tokens": 438,
    "latencies_ms": [
-    146.4,
-    160.8,
-    120.8,
-    131.0,
-    140.6,
-    146.6,
-    165.3,
-    219.7,
-    144.9,
-    116.2,
-    123.0
+    119.5
    ],
-   "reasons": []
+   "reasons": [
+    "B- stock is not fetched from e-RaktKosh in this deployment (only O+, O-); an officer must check B- availability"
+   ]
   },
   {
    "id": "c07",
    "note": "MTP: 4 units A positive, 30F placental abruption, typed A+.",
-   "expected_status": "ROUTED",
-   "status": "ROUTED",
+   "expected_status": "HOLD_FOR_HUMAN",
+   "status": "HOLD_FOR_HUMAN",
    "expected_urgency_band": 3,
    "urgency_band": 3,
-   "chosen": "Dr. Ysr-Jakkampudi Rammohan Rao Blood Centre (O+)",
+   "chosen": null,
    "unsafe": false,
-   "decision_calls": 11,
-   "input_tokens": 5093,
+   "decision_calls": 1,
+   "input_tokens": 440,
    "latencies_ms": [
-    133.6,
-    179.2,
-    174.2,
-    164.1,
-    176.3,
-    159.5,
-    174.4,
-    159.4,
-    178.8,
-    144.4,
-    126.4
+    111.5
    ],
-   "reasons": []
+   "reasons": [
+    "A+ stock is not fetched from e-RaktKosh in this deployment (only O+, O-); an officer must check A+ availability"
+   ]
   },
   {
    "id": "c08",
    "note": "2 units AB+ urgently, massive haemorrhage during surgery, patient AB positive.",
-   "expected_status": "ROUTED",
-   "status": "ROUTED",
+   "expected_status": "HOLD_FOR_HUMAN",
+   "status": "HOLD_FOR_HUMAN",
    "expected_urgency_band": 3,
    "urgency_band": 3,
-   "chosen": "Dr. Ysr-Jakkampudi Rammohan Rao Blood Centre (O+)",
+   "chosen": null,
    "unsafe": false,
-   "decision_calls": 11,
-   "input_tokens": 5049,
+   "decision_calls": 1,
+   "input_tokens": 436,
    "latencies_ms": [
-    116.9,
-    159.2,
-    168.7,
-    149.1,
-    173.6,
-    130.3,
-    167.7,
-    163.8,
-    120.6,
-    137.1,
-    128.6
+    119.1
    ],
-   "reasons": []
+   "reasons": [
+    "AB+ stock is not fetched from e-RaktKosh in this deployment (only O+, O-); an officer must check AB+ availability"
+   ]
   },
   {
    "id": "c09",
@@ -215,14 +191,14 @@
    "decision_calls": 8,
    "input_tokens": 3607,
    "latencies_ms": [
-    148.0,
-    154.2,
-    162.7,
-    131.8,
-    170.5,
-    143.9,
-    151.7,
-    213.7
+    106.5,
+    182.8,
+    146.4,
+    165.8,
+    162.4,
+    178.9,
+    176.4,
+    190.8
    ],
    "reasons": []
   },
@@ -238,11 +214,11 @@
    "decision_calls": 5,
    "input_tokens": 2304,
    "latencies_ms": [
-    235.9,
-    133.5,
-    185.8,
-    160.3,
-    126.6
+    122.1,
+    157.4,
+    179.0,
+    159.1,
+    169.1
    ],
    "reasons": []
   },
@@ -258,42 +234,34 @@
    "decision_calls": 8,
    "input_tokens": 3559,
    "latencies_ms": [
-    133.9,
-    138.1,
-    161.9,
-    141.5,
-    138.6,
-    155.3,
-    145.2,
-    119.8
+    117.4,
+    199.0,
+    225.4,
+    200.2,
+    182.0,
+    181.6,
+    208.1,
+    118.0
    ],
    "reasons": []
   },
   {
    "id": "c12",
    "note": "2 units B+ for dengue with bleeding, platelets low and Hb falling, patient B+.",
-   "expected_status": "ROUTED",
-   "status": "ROUTED",
+   "expected_status": "HOLD_FOR_HUMAN",
+   "status": "HOLD_FOR_HUMAN",
    "expected_urgency_band": 2,
    "urgency_band": 2,
-   "chosen": "Dr. Ysr-Jakkampudi Rammohan Rao Blood Centre (O+)",
+   "chosen": null,
    "unsafe": false,
-   "decision_calls": 11,
-   "input_tokens": 5032,
+   "decision_calls": 1,
+   "input_tokens": 439,
    "latencies_ms": [
-    130.4,
-    215.3,
-    188.8,
-    180.4,
-    150.3,
-    171.9,
-    192.2,
-    206.8,
-    147.0,
-    170.7,
-    126.3
+    119.9
    ],
-   "reasons": []
+   "reasons": [
+    "B+ stock is not fetched from e-RaktKosh in this deployment (only O+, O-); an officer must check B+ availability"
+   ]
   },
   {
    "id": "c13",
@@ -305,19 +273,19 @@
    "chosen": null,
    "unsafe": false,
    "decision_calls": 11,
-   "input_tokens": 6278,
+   "input_tokens": 5053,
    "latencies_ms": [
-    248.5,
-    148.9,
-    115.9,
-    161.8,
-    189.1,
-    188.9,
-    185.5,
-    187.5,
-    186.8,
-    200.5,
-    186.7
+    112.0,
+    124.8,
+    122.0,
+    133.7,
+    125.6,
+    173.6,
+    222.1,
+    131.0,
+    152.6,
+    157.9,
+    177.6
    ],
    "reasons": [
     "no candidate bank passed every check"
@@ -335,14 +303,14 @@
    "decision_calls": 8,
    "input_tokens": 3541,
    "latencies_ms": [
-    144.2,
-    157.6,
-    145.9,
-    152.8,
-    132.2,
-    131.2,
-    196.9,
-    196.0
+    144.5,
+    134.9,
+    136.4,
+    180.4,
+    129.4,
+    153.0,
+    186.3,
+    165.7
    ],
    "reasons": []
   },
@@ -358,14 +326,14 @@
    "decision_calls": 8,
    "input_tokens": 3589,
    "latencies_ms": [
-    140.7,
-    164.2,
-    165.6,
-    139.8,
-    120.0,
-    157.8,
-    163.4,
-    163.0
+    113.8,
+    189.0,
+    173.9,
+    152.0,
+    172.4,
+    170.8,
+    150.1,
+    197.8
    ],
    "reasons": []
   },
@@ -381,38 +349,30 @@
    "decision_calls": 4,
    "input_tokens": 1886,
    "latencies_ms": [
-    163.3,
-    190.6,
-    130.4,
-    142.9
+    188.7,
+    202.4,
+    130.2,
+    160.9
    ],
    "reasons": []
   },
   {
    "id": "c17",
    "note": "Reserve 3 units A-negative for elective CABG on Thursday, patient A-negative.",
-   "expected_status": "ROUTED",
-   "status": "ROUTED",
+   "expected_status": "HOLD_FOR_HUMAN",
+   "status": "HOLD_FOR_HUMAN",
    "expected_urgency_band": 1,
    "urgency_band": 1,
-   "chosen": "Ntr Memorial Trust Blood Centre Rajamahendravaram (O-)",
+   "chosen": null,
    "unsafe": false,
-   "decision_calls": 11,
-   "input_tokens": 6244,
+   "decision_calls": 1,
+   "input_tokens": 436,
    "latencies_ms": [
-    164.3,
-    144.3,
-    148.4,
-    144.2,
-    144.3,
-    174.9,
-    140.4,
-    141.7,
-    191.5,
-    197.2,
-    140.0
+    156.2
    ],
-   "reasons": []
+   "reasons": [
+    "A- stock is not fetched from e-RaktKosh in this deployment (only O+, O-); an officer must check A- availability"
+   ]
   },
   {
    "id": "c18",
@@ -426,15 +386,15 @@
    "decision_calls": 9,
    "input_tokens": 4001,
    "latencies_ms": [
-    200.4,
-    136.1,
-    162.6,
-    139.1,
-    143.8,
-    126.7,
-    145.7,
-    135.6,
-    155.6
+    182.4,
+    170.3,
+    144.7,
+    169.0,
+    156.5,
+    209.9,
+    136.5,
+    167.1,
+    231.7
    ],
    "reasons": []
   },
@@ -442,25 +402,27 @@
    "id": "c19",
    "note": "Monthly restock: 10 units O-negative. No active cases. All ward patients are typed Rh-positive.",
    "expected_status": "ROUTED",
-   "status": "ROUTED",
+   "status": "HOLD_FOR_HUMAN",
    "expected_urgency_band": 0,
    "urgency_band": 0,
-   "chosen": "Dr. Ysr-Jakkampudi Rammohan Rao Blood Centre (O+)",
+   "chosen": null,
    "unsafe": false,
    "decision_calls": 9,
-   "input_tokens": 5335,
+   "input_tokens": 4110,
    "latencies_ms": [
-    128.5,
-    183.6,
-    154.5,
-    150.5,
-    165.9,
-    165.6,
-    167.5,
-    168.1,
-    149.5
+    131.6,
+    123.8,
+    225.4,
+    203.0,
+    192.2,
+    194.1,
+    181.4,
+    172.4,
+    168.7
    ],
-   "reasons": []
+   "reasons": [
+    "no candidate bank passed every check"
+   ]
   },
   {
    "id": "c20",
@@ -472,17 +434,17 @@
    "chosen": null,
    "unsafe": false,
    "decision_calls": 9,
-   "input_tokens": 5290,
+   "input_tokens": 4065,
    "latencies_ms": [
-    194.1,
-    292.6,
-    153.4,
-    132.0,
-    119.8,
-    150.8,
-    150.1,
-    192.6,
-    170.2
+    146.2,
+    133.9,
+    127.3,
+    251.9,
+    148.7,
+    146.7,
+    170.1,
+    146.5,
+    143.6
    ],
    "reasons": [
     "no candidate bank passed every check"
@@ -500,14 +462,14 @@
    "decision_calls": 8,
    "input_tokens": 3525,
    "latencies_ms": [
-    121.4,
-    165.0,
-    163.2,
-    163.9,
-    175.9,
-    146.4,
-    146.9,
-    162.5
+    155.2,
+    177.1,
+    178.2,
+    179.2,
+    256.7,
+    157.0,
+    173.2,
+    175.9
    ],
    "reasons": []
   },
@@ -523,14 +485,14 @@
    "decision_calls": 8,
    "input_tokens": 3517,
    "latencies_ms": [
-    131.8,
-    125.0,
-    185.2,
-    123.5,
-    187.1,
-    133.5,
-    141.6,
-    154.9
+    124.5,
+    200.4,
+    257.2,
+    278.6,
+    252.0,
+    174.8,
+    254.2,
+    224.7
    ],
    "reasons": []
   },
@@ -544,18 +506,18 @@
    "chosen": null,
    "unsafe": false,
    "decision_calls": 10,
-   "input_tokens": 5787,
+   "input_tokens": 4562,
    "latencies_ms": [
-    129.3,
-    152.0,
-    116.4,
-    167.6,
-    131.1,
-    125.9,
-    151.5,
-    142.9,
-    126.1,
-    142.9
+    113.6,
+    132.7,
+    155.0,
+    164.5,
+    181.4,
+    165.5,
+    162.4,
+    187.3,
+    198.3,
+    192.5
    ],
    "reasons": [
     "no candidate bank passed every check"
@@ -571,15 +533,15 @@
    "chosen": null,
    "unsafe": false,
    "decision_calls": 7,
-   "input_tokens": 4106,
+   "input_tokens": 3056,
    "latencies_ms": [
-    125.2,
-    143.4,
-    115.9,
-    135.9,
-    154.7,
-    146.9,
-    155.9
+    128.9,
+    203.8,
+    200.9,
+    203.9,
+    203.0,
+    201.6,
+    201.4
    ],
    "reasons": [
     "no candidate bank passed every check"
@@ -597,7 +559,7 @@
    "decision_calls": 1,
    "input_tokens": 427,
    "latencies_ms": [
-    129.0
+    200.7
    ],
    "reasons": [
     "note judged ambiguous (p=1.00 >= 0.3)",
@@ -617,7 +579,7 @@
    "decision_calls": 1,
    "input_tokens": 428,
    "latencies_ms": [
-    124.7
+    128.9
    ],
    "reasons": [
     "note judged ambiguous (p=0.43 >= 0.3)",
@@ -637,7 +599,7 @@
    "decision_calls": 1,
    "input_tokens": 427,
    "latencies_ms": [
-    152.5
+    166.5
    ],
    "reasons": [
     "number of units not stated in the note"
@@ -655,7 +617,7 @@
    "decision_calls": 1,
    "input_tokens": 429,
    "latencies_ms": [
-    145.0
+    117.3
    ],
    "reasons": [
     "note judged ambiguous (p=0.85 >= 0.3)",
@@ -674,7 +636,7 @@
    "decision_calls": 1,
    "input_tokens": 439,
    "latencies_ms": [
-    126.2
+    146.5
    ],
    "reasons": [
     "blood group not stated (or more than one) in the note"
@@ -692,7 +654,7 @@
    "decision_calls": 1,
    "input_tokens": 428,
    "latencies_ms": [
-    201.1
+    120.8
    ],
    "reasons": [
     "no bank in East Godavari, Andhra Pradesh holds 100 units of O+ or a substitute"
