@@ -8,7 +8,43 @@ Synthetic requests. Decision support only. Nothing is dispatched automatically.
 
 ## The problem
 
-In an emergency, hospital staff phone blood banks one by one to find compatible units. Stock is spread across many small banks, and the clinical context that should decide who gets scarce O-negative lives in free-text notes. A routine restock can quietly drain the O-negative that a critical patient at the same bank still needs. A stock spreadsheet cannot read "placenta accreta, history of massive haemorrhage, 8 units reserved for tomorrow".
+When a mother haemorrhages after delivery, the first delay is finding the blood.
+
+- **Searching takes hours.** In Bihar, obstetric providers estimated they wait **one to six hours** to receive blood. Three participants at a medical college without a blood bank said it takes "a minimum of two hours" to get blood from another medical college. One provider said that when blood arrives "within 3–4 hours either the patient is already dead or the doctor has already left". Source: [*The global surgery blood drought: frontline provider data on barriers and solutions in Bihar, India*, Global Health Action, 2019](https://pmc.ncbi.nlm.nih.gov/articles/PMC6493310/).
+- **Issue time is separate from search time.** Once a bank has the request, issue is much faster: at Government Medical College, Trivandrum (Kerala), mean turnaround from receiving an emergency request to the blood leaving the bank was **30.9 minutes** across 125 cases. Source: conference abstract, [Asian Journal of Transfusion Science 2015;9(Suppl 1)](https://pmc.ncbi.nlm.nih.gov/articles/PMC4455105/).
+- **Supply is short everywhere.** India had **2,903 blood banks** as of March 2018, and annual collection was **15% below** the requirement under the WHO norm of 1% of the population ([Factly, 2018](https://factly.in/blood-collection-increases-by-12-in-4-years-still-15-short-of-requirement)). A Lancet Haematology modelling study found that in 2017 **every country in south Asia** had insufficient blood to meet its needs ([Roberts et al., 2019](https://pubmed.ncbi.nlm.nih.gov/31631023/)).
+
+Scarcity means a routine restock can quietly drain the O-negative that a critical patient at the same bank still needs. The context that should decide this lives in free-text notes that a stock spreadsheet cannot read.
+
+## Before and after
+
+RaktSetu changes the **search** step only.
+
+| Step | Before (source) | After (measured, file) |
+|---|---|---|
+| Find a bank with compatible stock | 1–6 hours of calls and runners; at least 2 hours between medical colleges ([Bihar, 2019](https://pmc.ncbi.nlm.nih.gov/articles/PMC6493310/)) | All **16** banks in the district read from live e-RaktKosh in **0.88 s**. A ranked, explained recommendation in **6.3 s** p50 (n=5 live requests, Decisions API + Sol), with 166 ms p50 per Decisions API call over 30 cases ([evals/latency.json](evals/latency.json), [evals/results.md](evals/results.md)) |
+| Check it is safe to take that bank's stock | Phone conversation, if at all | Per-bank reserve and priority judgments, pending-order arithmetic in code, every blocked bank shown with its reason ([src/raktsetu/policy.py](src/raktsetu/policy.py)) |
+| Bank issues the blood | ~31 min mean emergency issue time ([Kerala, 2015](https://pmc.ncbi.nlm.nih.gov/articles/PMC4455105/)) | **Unchanged.** RaktSetu does not touch the bank's issue process. |
+| Transport to the patient | Distance, roads, train timetables ([Bihar, 2019](https://pmc.ncbi.nlm.nih.gov/articles/PMC6493310/)) | **Unchanged.** |
+| Decision to dispatch | Whoever is on the phone | **Unchanged:** a blood bank officer confirms. RaktSetu never dispatches ([src/raktsetu/api.py](src/raktsetu/api.py), `/confirm`). |
+
+The 0.88 s and 6.3 s figures come from one live run on 10 October 2026 (`RAKTSETU_REPLAY=0 python evals/latency.py 5`). They are a small sample, not a benchmark.
+
+## Ready to use (pilot-ready, not production-certified)
+
+- **It reads the Health Ministry's live data.** RaktSetu calls the e-RaktKosh blood-availability API directly ([src/raktsetu/eraktkosh.py](src/raktsetu/eraktkosh.py), `fetch_live`). The live pull on 10 October 2026 returned real data: 16 banks in East Godavari, 32 bank-by-group records ([evals/latency.json](evals/latency.json)).
+- **Any district e-RaktKosh covers works with no code change.** Set `ERAKTKOSH_STATE` and `ERAKTKOSH_DISTRICT` (e-RaktKosh numeric codes) in `.env`. Only East Godavari has been exercised so far.
+- **Integration points:**
+  - `POST /route`: request text in, ranked recommendation out.
+  - `POST /confirm`: officer confirmation, written to the audit log.
+  - `GET /source`: which stock data is in use.
+  - `GET /`: the officer console.
+  - CLI: `python -m raktsetu route --text "..."` and `python -m raktsetu demo`.
+- **What it does not do yet:**
+  - It does not place orders inside a blood bank's own system or move blood. The officer confirms and the existing ordering process continues.
+  - It only fetches O-negative and O-positive packed red cells. Other groups are held for the officer.
+  - Pending orders are synthetic, because e-RaktKosh publishes stock, not reservations.
+  - The console has no authentication.
 
 ## Who uses it (viability)
 
@@ -84,6 +120,8 @@ Demo scenarios ([data/demo_requests.json](data/demo_requests.json), `python -m r
      → ranking (code)
      → GPT-6.1 Sol writes the bank request, officer explanation and follow-up question (writer.py)
      → officer confirms (api.py /confirm) → out/audit.jsonl
+
+Module ownership, fail-closed points and replay are described in [ARCHITECTURE.md](ARCHITECTURE.md).
 
 Code does all arithmetic and enforces the hard limits itself: stock now, stock after dispatch, units already pending (a shortfall holds whatever the model says), never emptying a bank, ABO/Rh compatibility. The model receives those facts as text and answers typed questions ([src/raktsetu/router.py](src/raktsetu/router.py), `candidate_facts`).
 

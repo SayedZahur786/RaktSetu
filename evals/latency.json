@@ -1,0 +1,29 @@
+{
+ "measured_at": "2026-10-10T12:57:26+0530",
+ "stock": {
+  "source": "live",
+  "region": "East Godavari, Andhra Pradesh",
+  "fetched_at": "2026-10-10 12:56",
+  "state_code": "28",
+  "district_code": "545",
+  "banks": 16,
+  "bank_group_records": 32,
+  "groups": [
+   "O-",
+   "O+"
+  ],
+  "fetch_seconds": 0.88
+ },
+ "requests": 5,
+ "route_seconds": {
+  "p50": 6.29,
+  "p90": 6.9,
+  "max": 6.9
+ },
+ "includes": "Decisions API calls (request + every candidate bank) and the GPT-6.1 Sol writer; excludes the stock fetch, reported separately",
+ "writer_template_fallbacks": 0,
+ "statuses": {
+  "HOLD_FOR_HUMAN": 3,
+  "ROUTED": 2
+ }
+}
