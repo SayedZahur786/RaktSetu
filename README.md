@@ -1,0 +1,109 @@
+# RaktSetu
+
+Blood request routing on live e-RaktKosh stock. The OpenAI Decisions API judges every request, code decides, and a blood bank officer confirms.
+
+Synthetic requests. Decision support only. Nothing is dispatched automatically.
+
+![Officer console](docs/console.png)
+
+## The problem
+
+In an emergency, hospital staff phone blood banks one by one to find compatible units. Stock is spread across many small banks, and the clinical context that should decide who gets scarce O-negative lives in free-text notes. A routine restock can quietly drain the O-negative that a critical patient at the same bank still needs. A stock spreadsheet cannot read "placenta accreta, history of massive haemorrhage, 8 units reserved for tomorrow".
+
+## Who uses it (viability)
+
+Blood bank officers and hospital transfusion services. RaktSetu replaces phone calls and spreadsheet checks with a ranked, explained recommendation that the officer confirms or rejects.
+
+Cost per request: 6.9 Decisions API calls and about 3,450 input tokens on average, which is **$0.000345 per request** at $0.10 per 1M input tokens. The writer (GPT-6.1 Sol) is one more call per request and is not included in that figure. Numbers come from [evals/results.md](evals/results.md).
+
+## Quickstart (no API key needed)
+
+    python -m venv .venv && source .venv/bin/activate
+    pip install -r requirements.txt
+    RAKTSETU_REPLAY=1 python -m raktsetu demo
+    RAKTSETU_REPLAY=1 pytest -q
+    RAKTSETU_REPLAY=1 uvicorn raktsetu.api:app    # officer console at http://127.0.0.1:8000
+
+In replay mode, every Decisions API and Sol call is served from [fixtures/replay/](fixtures/replay/), recorded from live runs, with no network calls. A request that was never recorded fails with a clear error instead of guessing.
+
+To run live, copy `.env.example` to `.env`, set `OPENAI_API_KEY`, and set `RAKTSETU_REPLAY=0`:
+
+    python -m raktsetu route --text "2 units O-negative, massive transfusion, Jayanagar"
+    python -m raktsetu demo --simulate-outage
+
+Each run prints the stock source (`live` or `snapshot`, with a timestamp).
+
+## Results
+
+From [evals/results.md](evals/results.md): 30 synthetic, hand-labelled requests ([evals/cases.jsonl](evals/cases.jsonl)) run against the e-RaktKosh snapshot. Recorded live; `RAKTSETU_REPLAY=1 python evals/run.py` reproduces them.
+
+| Metric | Value |
+|---|---|
+| Cases | 30 |
+| Urgency accuracy (exact band of 4) | 97% |
+| Urgency within one band | 100% |
+| Status accuracy | 100% |
+| **Unsafe recommendations** | **0** |
+| HOLD_FOR_HUMAN rate | 33% |
+| p50 Decisions API call latency | 154.9 ms |
+| Decisions API cost per request | $0.000345 |
+
+Policy history: the first live eval run produced **1 unsafe recommendation** (case c13). It routed 4 O-negative units to a bank holding exactly 4. The reserve check judged that "safe" because no pending order was described there, but it would have left the bank with no O-negative at all. We added `min_units_after_dispatch: 1` to [policy.yaml](policy.yaml): a dispatch that would empty a bank goes to the officer. c13's label was not changed. The table above is the run after that change.
+
+Demo scenarios ([data/demo_requests.json](data/demo_requests.json), `python -m raktsetu demo`):
+
+| # | Scenario | Result |
+|---|---|---|
+| 1 | Massive transfusion, 2 units O-neg | Government Teaching General Hospital **BLOCKED**: reserve unsafe, because its 6 O-neg are earmarked for a trauma case in theatre. NTR Memorial **RECOMMEND** (4 → 2). |
+| 2 | Routine restock, 10 units O-neg | The only bank with 10 O-neg is **BLOCKED**: reserve unsafe and priority defer, with 8 units reserved for tomorrow's surgery. The note says the ward patients are Rh-positive, so `substitution_ok` approves **O+**, which is routed. |
+| 3 | "need blood asap pls" | **HOLD_FOR_HUMAN**. Sol writes the follow-up question: which group, how many units, what for. |
+| 4 | Decisions API outage | **HOLD_FOR_HUMAN** for every bank. The audit log records the failure reason. |
+
+## How it works
+
+    request
+     → parse group and units (code, compat.py)
+     → e-RaktKosh stock, live or snapshot (eraktkosh.py)
+     → Decisions API, request: urgency (score) + note_ambiguous (predicate)
+     → candidate banks with enough stock; units after dispatch (code)
+     → Decisions API, one call per bank, concurrent: reserve_check + priority_check (choice)
+     → if no exact-group bank passes: compatible substitutes; Rh-positive substitutes also ask substitution_ok (predicate)
+     → policy.yaml thresholds → RECOMMEND / HOLD_FOR_HUMAN / BLOCKED / NO_STOCK (policy.py, code)
+     → ranking (code)
+     → GPT-6.1 Sol writes the bank request, officer explanation and follow-up question (writer.py)
+     → officer confirms (api.py /confirm) → out/audit.jsonl
+
+Code does all arithmetic: stock now, stock after dispatch, units already pending, ABO/Rh compatibility. The model receives those facts as text and answers typed questions ([src/raktsetu/router.py](src/raktsetu/router.py), `candidate_facts`).
+
+## Built on OpenAI
+
+| Product | Role | Code |
+|---|---|---|
+| Decisions API (`gpt-6-luna`) | Typed judgments with probabilities: urgency (score), reserve safety and priority (choice), substitution and ambiguity (predicate). Refusals are handled. | [src/raktsetu/decide.py](src/raktsetu/decide.py): `OpenAIDecider.ask`, `parse_decision` |
+| GPT-6.1 Sol (Responses API, reasoning effort `low`, JSON schema output) | Writes the bank request, the officer explanation and the follow-up question. The prompt states it cannot change the decision. | [src/raktsetu/writer.py](src/raktsetu/writer.py): `SolWriter.write` |
+
+**Why the Decisions API and not a chat completion:** answers come in fixed types that code can threshold, with a probability for every option, so `p(unsafe) >= 0.5` blocks a dispatch and `p(safe) < 0.7` holds it. Pricing is on input tokens only, which makes it affordable to check every candidate bank, not just the first.
+
+`decide.py` is the only file that knows the Decisions API wire format. The rest of the code works with `QuestionSpec` in and `Verdict` out, so another decision model can be swapped in behind the `Decider` protocol.
+
+## Safety
+
+- **Fails closed.** Any API error, timeout, refusal, missing answer, malformed response or low probability ends in `HOLD_FOR_HUMAN`, never `RECOMMEND`. See [src/raktsetu/policy.py](src/raktsetu/policy.py); tests in [tests/test_router_failclosed.py](tests/test_router_failclosed.py) and [tests/test_policy.py](tests/test_policy.py).
+- **No automatic dispatch.** Even a `ROUTED` result needs an officer. `/confirm` only appends `CONFIRMED` to `out/audit.jsonl`, and only for a bank that the server itself returned as `RECOMMEND` or `HOLD_FOR_HUMAN` ([src/raktsetu/api.py](src/raktsetu/api.py)).
+- **Blocked banks stay visible,** with the verdict that blocked them.
+- **Every threshold** lives in [policy.yaml](policy.yaml).
+- **Every decision is audited:** request, each candidate, raw probabilities, status, reasons, data source, model ids and latency ([src/raktsetu/audit.py](src/raktsetu/audit.py)).
+- **Synthetic requests only.** Stock is real e-RaktKosh data.
+
+## Limitations
+
+- **Pending orders are synthetic.** They come from [data/demo_requests.json](data/demo_requests.json). e-RaktKosh publishes stock, not reservations, so a real deployment needs the bank's own order book.
+- **Coverage is limited.** Only packed red cells, O-negative and O-positive, are fetched. These are the e-RaktKosh group ids verified so far. The default district is East Godavari, Andhra Pradesh, matching the snapshot. Other districts can be tried by setting `ERAKTKOSH_STATE` / `ERAKTKOSH_DISTRICT` (numeric e-RaktKosh codes). Coverage of any other district, including Bengaluru, is not verified.
+- **No locations.** e-RaktKosh returns no coordinates, so ranking never uses distance in practice.
+- **`substitution_ok` varies between banks.** It judges the note, but it is asked inside each bank's call, so the same note scored between 0.51 and 0.96 across banks in demo 2. Policy holds the low-confidence banks, so this is safe, but asking it once per request would be more consistent.
+- **The eval set is small:** 30 cases, synthetic, labelled by the authors. It shows the gates behave as intended. It is not a clinical validation.
+- **Not a medical device.** RaktSetu does not replace crossmatching, blood bank SOPs or an officer's judgment.
+
+## Credits
+
+Extends Blood Bank Router ([sreeprasad/ekrakt](https://github.com/sreeprasad/ekrakt)), built at JEVATHON (TypeSafe AI × The AI Collective), 26 September 2026. Stock data from [e-RaktKosh](https://eraktkosh.mohfw.gov.in), Ministry of Health and Family Welfare. See [NOTICE](NOTICE).

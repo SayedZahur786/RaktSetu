@@ -1,0 +1,22 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      RAKTSETU_REPLAY: "1"   # recorded fixtures only: no network calls, no API key
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: pytest -q
+      - run: python -m raktsetu demo
+      - name: Eval replay must reproduce 0 unsafe recommendations
+        run: python evals/run.py

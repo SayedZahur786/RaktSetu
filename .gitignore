@@ -7,3 +7,4 @@ out/
 .superpowers/
 .DS_Store
 *.egg-info/
+.playwright-mcp/

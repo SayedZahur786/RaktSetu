@@ -123,7 +123,8 @@ class Router:
             c = Candidate(bank=b.name, blood_group=group, exact=exact, needs_permission=needs_permission,
                           units_now=b.units, units_after=b.units - req.units, pending_summary=summary)
             if b.units < req.units:
-                c.status, c.reasons, c.units_after = "NO_STOCK", [f"only {b.units} units of {group}"], b.units
+                c.status, c.units_after = "NO_STOCK", b.units
+                c.reasons = [f"only {b.units} unit(s) of {group}, {req.units} needed"]
             out.append(c)
         return out
 
