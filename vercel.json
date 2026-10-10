@@ -1,11 +1,12 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "regions": ["bom1"],
+  "regions": [
+    "bom1"
+  ],
   "functions": {
     "api/index.py": {
       "maxDuration": 60,
       "includeFiles": "{src/**,static/**,data/**,policy.yaml}"
     }
-  },
-  "rewrites": [{ "source": "/(.*)", "destination": "/api/index" }]
+  }
 }

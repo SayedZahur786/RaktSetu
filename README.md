@@ -2,7 +2,11 @@
 
 Blood request routing on live e-RaktKosh stock. The OpenAI Decisions API judges every request, code decides, and a blood bank officer confirms.
 
+[![ci](https://github.com/SayedZahur786/RaktSetu/actions/workflows/ci.yml/badge.svg)](https://github.com/SayedZahur786/RaktSetu/actions/workflows/ci.yml) · 123 tests (`RAKTSETU_REPLAY=1 pytest -q`) · Team: _TBD_
+
 Synthetic requests. Decision support only. Nothing is dispatched automatically.
+
+**Statuses.** A request ends as `ROUTED`, `HOLD_FOR_HUMAN` or `NO_STOCK`. Each candidate bank inside it is `RECOMMEND`, `HOLD_FOR_HUMAN`, `BLOCKED` or `NO_STOCK`. A request is `ROUTED` only when at least one bank is `RECOMMEND`.
 
 ![Officer console](docs/console.png)
 
@@ -60,11 +64,11 @@ Cost per request: 5.2 Decisions API calls and about 2,360 input tokens on averag
     RAKTSETU_REPLAY=1 pytest -q
     RAKTSETU_REPLAY=1 uvicorn raktsetu.api:app    # officer console at http://127.0.0.1:8000
 
-In replay mode, every Decisions API and Sol call is served from [fixtures/replay/](fixtures/replay/), recorded from live runs, with no network calls. A request that was never recorded fails with a clear error instead of guessing.
+Replay mode reproduces recorded model outputs; live mode (`RAKTSETU_REPLAY=0`) calls the Decisions API, Sol and e-RaktKosh. In replay mode, every Decisions API and Sol call is served from [fixtures/replay/](fixtures/replay/), recorded from live runs, with no network calls. A request that was never recorded fails with a clear error instead of guessing.
 
 To run live, copy `.env.example` to `.env`, set `OPENAI_API_KEY`, and set `RAKTSETU_REPLAY=0`:
 
-    python -m raktsetu route --text "2 units O-negative, massive transfusion, Jayanagar"
+    python -m raktsetu route --text "2 units O-negative, massive transfusion, post-partum haemorrhage, Rajahmundry"
     python -m raktsetu demo --simulate-outage
 
 Each run prints the stock source (`live` or `snapshot`, with a timestamp).
@@ -80,9 +84,16 @@ From [evals/results.md](evals/results.md): 30 synthetic, hand-labelled requests 
 | Urgency within one band | 100% |
 | Status accuracy | 97% (29/30) |
 | **Unsafe recommendations** | **0** |
-| HOLD_FOR_HUMAN rate | 53% |
+| HOLD_FOR_HUMAN rate (request level) | 53% |
+| Utility: ROUTED-labelled cases actually routed | 93% (13/14) |
 | p50 Decisions API call latency | 165.8 ms |
 | Decisions API cost per request | $0.000236 |
+
+Holds are deliberate refusals to guess, not failures to answer. The 16 held requests break down as follows ([evals/results.md](evals/results.md)):
+
+- 6: no bank passed the reserve, priority or substitution checks;
+- 5: the blood group isn't fetched from e-RaktKosh (data coverage);
+- 5: the note left the group or units missing or ambiguous.
 
 The one miss is c19, a restock note saying the ward patients are Rh-positive. We labelled it ROUTED (O+ substitute), but the model judged the substitution uncertain and the request held. That error is in the safe direction.
 
@@ -113,7 +124,7 @@ Demo scenarios ([data/demo_requests.json](data/demo_requests.json), `python -m r
      → e-RaktKosh stock, live or snapshot (eraktkosh.py)
      → Decisions API, request: urgency (score) + note_ambiguous (predicate)
      → candidate banks with enough stock; units after dispatch (code)
-     → groups e-RaktKosh stock is not fetched for → HOLD (unknown is not zero)
+     → groups e-RaktKosh stock is not fetched for → HOLD_FOR_HUMAN (unknown is not zero)
      → Decisions API, one call per bank, concurrent: reserve_check + priority_check (choice)
      → if no exact-group bank passes: compatible substitutes; Rh-positive substitutes need substitution_ok (predicate, asked once per request)
      → policy.yaml thresholds → RECOMMEND / HOLD_FOR_HUMAN / BLOCKED / NO_STOCK (policy.py, code)
@@ -154,6 +165,12 @@ Code does all arithmetic and enforces the hard limits itself: stock now, stock a
 - **No authentication on the console.** The officer name is free text. A deployment needs real sign-in.
 - **The eval set is small:** 30 cases, synthetic, labelled by the authors. It shows the gates behave as intended. It is not a clinical validation.
 - **Not a medical device.** RaktSetu does not replace crossmatching, blood bank SOPs or an officer's judgment.
+
+## Next steps
+
+- A held-out live eval on cases not used while developing.
+- Cost per request including the GPT-6.1 Sol call.
+- A second independent review round.
 
 ## Credits
 

@@ -46,7 +46,7 @@ Every claim in README.md and where it is proved. Update this table whenever a cl
 | Reads the live e-RaktKosh API | `src/raktsetu/eraktkosh.py` `fetch_live`; live pull result in `evals/latency.json` (`stock.source = live`) |
 | 16 banks pulled in 0.88 s; 6.3 s p50 per request (n=5, live) | `evals/latency.json`, produced by `evals/latency.py` |
 | 166 ms p50 per Decisions API call; 5.2 calls and $0.000236 per request | `evals/results.md` / `evals/results.json`, produced by `evals/run.py` |
-| 0 unsafe recommendations, 97% status accuracy over 30 cases | `evals/results.md`; cases in `evals/cases.jsonl` |
+| 0 unsafe recommendations, 97% status accuracy, 93% utility, hold-reason breakdown over 30 cases | `evals/results.md`; cases in `evals/cases.jsonl` |
 | Fails closed (errors, refusals, malformed numbers, stale stock) | `tests/test_hardening.py`, `tests/test_router_failclosed.py`, `tests/test_policy.py`; `src/raktsetu/policy.py`, `src/raktsetu/router.py` `Router._ask` |
 | The model judges, code decides; thresholds only in policy.yaml | `policy.yaml`; `src/raktsetu/policy.py` `request_gate`, `candidate_status` |
 | Pending-order shortfall and "never empty a bank" are enforced in code | `src/raktsetu/policy.py` `candidate_status`; `tests/test_hardening.py::test_policy_holds_when_dispatch_leaves_less_than_pending`, `tests/test_policy.py::test_dispatch_that_empties_bank_holds` |

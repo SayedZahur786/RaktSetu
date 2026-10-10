@@ -11,3 +11,6 @@ evals
 docs
 *.egg-info
 __pycache__
+.env.local
+.env*.local
+.vercel

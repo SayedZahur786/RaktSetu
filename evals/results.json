@@ -6,6 +6,13 @@
   "status_accuracy": 0.9666666666666667,
   "unsafe_recommendations": 0,
   "hold_rate": 0.5333333333333333,
+  "hold_reasons": {
+   "no bank passed the reserve/priority/substitution checks": 6,
+   "blood group not fetched from e-RaktKosh (data coverage)": 5,
+   "note unclear: group or units missing or ambiguous": 5
+  },
+  "utility_routed_when_routable": 0.9285714285714286,
+  "routed_labelled_cases": 14,
   "p50_decision_call_latency_ms": 165.8,
   "mean_decision_calls_per_request": 5.23,
   "mean_input_tokens_per_request": 2360,

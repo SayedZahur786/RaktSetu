@@ -28,6 +28,20 @@ from raktsetu.router import Router, load_demo, parse_request, pending_summary
 HERE = Path(__file__).resolve().parent
 PRICE_PER_M_INPUT = 0.10  # USD per 1M input tokens, Decisions API (gpt-6-luna)
 LEVELS = [lvl for lvl, _ in URGENCY_LEVELS]
+# Why a request was held, matched on the router's request-level reason text (first match wins).
+HOLD_CATEGORIES = [
+    ("blood group not fetched from e-RaktKosh (data coverage)", "stock is not fetched"),
+    ("note unclear: group or units missing or ambiguous", "not stated"),
+    ("note judged ambiguous by the model", "note judged ambiguous"),
+    ("no bank passed the reserve/priority/substitution checks", "no candidate bank passed every check"),
+    ("decision call failed", "decision call failed"),
+    ("live stock unavailable (stale snapshot)", "live stock unavailable"),
+]
+
+
+def hold_category(reasons: list[str]) -> str:
+    joined = " | ".join(reasons)
+    return next((label for label, needle in HOLD_CATEGORIES if needle in joined), "other")
 
 
 def main() -> int:
@@ -61,6 +75,8 @@ def main() -> int:
         })
 
     n = len(rows)
+    holds = [hold_category(r["reasons"]) for r in rows if r["status"] == "HOLD_FOR_HUMAN"]
+    routed_labelled = [r for r in rows if r["expected_status"] == "ROUTED"]
     all_lat = [x for r in rows for x in r["latencies_ms"]]
     summary = {
         "cases": n,
@@ -70,6 +86,10 @@ def main() -> int:
         "status_accuracy": sum(r["status"] == r["expected_status"] for r in rows) / n,
         "unsafe_recommendations": sum(r["unsafe"] for r in rows),
         "hold_rate": sum(r["status"] == "HOLD_FOR_HUMAN" for r in rows) / n,
+        "hold_reasons": {label: holds.count(label) for label in sorted(set(holds), key=lambda x: -holds.count(x))},
+        "utility_routed_when_routable": (sum(r["status"] == "ROUTED" for r in routed_labelled) / len(routed_labelled)
+                                         if routed_labelled else None),
+        "routed_labelled_cases": len(routed_labelled),
         "p50_decision_call_latency_ms": round(statistics.median(all_lat), 1) if all_lat else None,
         "mean_decision_calls_per_request": round(sum(r["decision_calls"] for r in rows) / n, 2),
         "mean_input_tokens_per_request": round(sum(r["input_tokens"] for r in rows) / n),
@@ -97,10 +117,16 @@ def render(s: dict, rows: list[dict]) -> str:
         f"| Status accuracy | {pct(s['status_accuracy'])} |",
         f"| **Unsafe recommendations** | **{s['unsafe_recommendations']}** |",
         f"| HOLD_FOR_HUMAN rate | {pct(s['hold_rate'])} |",
+        f"| Utility: ROUTED-labelled cases actually routed | {pct(s['utility_routed_when_routable'])} "
+        f"({round(s['utility_routed_when_routable'] * s['routed_labelled_cases'])}/{s['routed_labelled_cases']}) |",
         f"| p50 Decisions API call latency | {s['p50_decision_call_latency_ms']} ms |",
         f"| Decisions API calls per request (mean) | {s['mean_decision_calls_per_request']} |",
         f"| Input tokens per request (mean) | {s['mean_input_tokens_per_request']} |",
         f"| Decisions API cost per request at $0.10 / 1M input tokens | ${s['cost_per_request_usd']:.6f} |",
+        "", "## Why requests were held", "",
+        "Holds are deliberate refusals to guess. Each held request is counted once, by its first request-level reason.",
+        "", "| Reason | Requests |", "|---|---|",
+        *[f"| {label} | {count} |" for label, count in s["hold_reasons"].items()],
         "", "## Cases", "",
         "| id | expected | got | urgency band (exp/got) | chosen | unsafe |", "|---|---|---|---|---|---|",
     ]

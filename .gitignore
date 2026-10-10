@@ -8,3 +8,5 @@ out/
 .DS_Store
 *.egg-info/
 .playwright-mcp/
+.vercel
+.env*

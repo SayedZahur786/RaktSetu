@@ -2,10 +2,12 @@
 
 RaktSetu turns a hospital's free-text blood request into a ranked, explained recommendation. A blood bank officer then confirms or rejects it. The models judge and write; Python decides. Every number below comes from a committed file.
 
+**Statuses.** Request level: `ROUTED`, `HOLD_FOR_HUMAN`, `NO_STOCK`. Candidate level: `RECOMMEND`, `HOLD_FOR_HUMAN`, `BLOCKED`, `NO_STOCK`.
+
 ## Request flow
 
 ```
-hospital note ──► parse_request (code)          group + units; ambiguous → None → HOLD
+hospital note ──► parse_request (code)          group + units; ambiguous → None → HOLD_FOR_HUMAN
                      │
 e-RaktKosh ──────► fetch_live / load_stock       live, or snapshot (fallback flagged → no RECOMMEND)
                      │
@@ -16,7 +18,7 @@ e-RaktKosh ──────► fetch_live / load_stock       live, or snapshot
                      │
                      ├─► Decisions API, per bank   reserve_check, priority_check (choice), concurrent
                      │   Decisions API, once       substitution_ok (predicate), only for Rh-positive substitutes
-                     │      └─ candidate_status (code, policy.yaml) → RECOMMEND / HOLD / BLOCKED / NO_STOCK
+                     │      └─ candidate_status (code, policy.yaml) → RECOMMEND / HOLD_FOR_HUMAN / BLOCKED / NO_STOCK
                      │
                      ├─► rank (code)               exact > always-compatible > note-permitted; most units left
                      ├─► GPT-6.1 Sol               bank request, officer explanation, follow-up question
