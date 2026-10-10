@@ -223,11 +223,11 @@ class Router:
 def build_router(simulate_outage: bool = False, audit_path: Path | None = None) -> Router:
     """Wire the production router from env + policy.yaml. Replay mode needs no API key."""
     policy = config.load_policy()
-    store = ReplayStore(config.FIXTURES_DIR, replay=config.replay_enabled())
+    store = ReplayStore(config.FIXTURES_DIR, replay=config.replay_enabled(), record=config.record_enabled())
     decider: Decider = OutageDecider() if simulate_outage else OpenAIDecider(store, timeout_s=policy.api_timeout_s)
     return Router(decider=decider, policy=policy, pending=load_demo().pending_orders,
                   writer=SolWriter(store, timeout_s=policy.api_timeout_s),
-                  audit=AuditLog(audit_path or config.OUT_DIR / "audit.jsonl"))
+                  audit=AuditLog(audit_path or config.out_dir() / "audit.jsonl"))
 
 
 def stock_for_run(prefer_live: bool) -> StockSnapshot:

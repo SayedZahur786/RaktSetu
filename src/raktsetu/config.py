@@ -37,6 +37,28 @@ def replay_enabled() -> bool:
     return os.environ.get("RAKTSETU_REPLAY", "0").strip() == "1"
 
 
+def record_enabled() -> bool:
+    """Live calls are recorded to fixtures/ unless RAKTSETU_RECORD=0 (read-only hosts such as Vercel)."""
+    return os.environ.get("RAKTSETU_RECORD", "1").strip() != "0"
+
+
+def out_dir() -> Path:
+    """Where the audit log goes. Serverless hosts point this at a writable path, e.g. /tmp/raktsetu."""
+    override = os.environ.get("RAKTSETU_OUT_DIR", "").strip()
+    return Path(override) if override else OUT_DIR
+
+
+def rate_limits() -> tuple[int, int]:
+    """(requests per minute, requests per day) per client on POST /route."""
+    return (int(os.environ.get("RAKTSETU_RATE_PER_MINUTE", "5")), int(os.environ.get("RAKTSETU_RATE_PER_DAY", "50")))
+
+
+def signing_key() -> bytes | None:
+    """HMAC key for confirm tokens. Unset means a random per-process key (fine for one process)."""
+    key = os.environ.get("RAKTSETU_SIGNING_KEY", "").strip()
+    return key.encode() if key else None
+
+
 def openai_api_key() -> str | None:
     """The key, or None. Never log or print the return value."""
     return os.environ.get("OPENAI_API_KEY") or None

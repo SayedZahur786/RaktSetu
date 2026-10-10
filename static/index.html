@@ -84,7 +84,7 @@ async function confirmCand(rec, c, btn) {
   if (!officer) return;
   btn.disabled = true;
   const r = await fetch("/confirm", { method: "POST", headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ decision_id: rec.decision_id, bank: c.bank, blood_group: c.blood_group, officer }) });
+    body: JSON.stringify({ confirm_token: c.confirm_token, officer }) });
   const body = await r.json();
   btn.replaceWith(el("span", { class: r.ok ? "RECOMMEND" : "err" }, r.ok ? `CONFIRMED by ${officer}. ${body.note}` : body.detail));
 }
@@ -111,7 +111,7 @@ function render(rec) {
     const tbody = el("tbody");
     for (const c of rec.candidates) {
       const action = el("td");
-      if (c.status === "RECOMMEND" || c.status === "HOLD_FOR_HUMAN") {
+      if (c.confirm_token) {
         const b = el("button", {}, c.status === "RECOMMEND" ? "Confirm" : "Override & confirm");
         b.onclick = () => confirmCand(rec, c, b);
         action.append(b);
@@ -137,6 +137,7 @@ $("go").onclick = async () => {
     const r = await fetch("/route", { method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text: $("text").value, hospital: $("hospital").value || null, simulate_outage: $("outage").checked }) });
     const body = await r.json();
+    if (r.status === 429) throw new Error("Rate limit reached. This public demo allows a few requests per minute per visitor.");
     if (!r.ok) throw new Error(typeof body.detail === "string" ? body.detail : JSON.stringify(body.detail));
     render(body);
   } catch (e) {

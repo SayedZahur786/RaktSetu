@@ -118,6 +118,7 @@ class Candidate(BaseModel):
     verdict: Verdict | None = None
     status: CandidateStatus = "HOLD_FOR_HUMAN"
     reasons: list[str] = Field(default_factory=list)
+    confirm_token: str | None = None              # set by api.py for confirmable candidates (signed, stateless)
 
 
 class Draft(BaseModel):

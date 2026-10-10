@@ -1,0 +1,13 @@
+.env
+.venv
+.git
+.github
+.superpowers
+.playwright-mcp
+fixtures
+out
+tests
+evals
+docs
+*.egg-info
+__pycache__
