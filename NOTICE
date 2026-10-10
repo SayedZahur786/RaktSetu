@@ -1,10 +1,7 @@
 RaktSetu
 ========
 
-This project extends "Blood Bank Router" (https://github.com/sreeprasad/ekrakt), built at
-JEVATHON (TypeSafe AI x The AI Collective) on 26 September 2026. The e-RaktKosh fetch logic in
-src/raktsetu/eraktkosh.py is ported from that project's agent.py, and
-data/eraktkosh_snapshot.json is that project's cached e-RaktKosh snapshot.
+The e-RaktKosh fetch logic and the September 2026 stock snapshot were adapted from sreeprasad/ekrakt (https://github.com/sreeprasad/ekrakt). That repository has no license file; we credit it and are seeking the author's permission.
 
 Blood stock data: e-RaktKosh, Ministry of Health and Family Welfare, Government of India
 (https://eraktkosh.mohfw.gov.in). Used for a non-commercial demonstration. RaktSetu is not

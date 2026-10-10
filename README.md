@@ -178,4 +178,6 @@ Code does all arithmetic and enforces the hard limits itself: stock now, stock a
 
 ## Credits
 
-Extends Blood Bank Router ([sreeprasad/ekrakt](https://github.com/sreeprasad/ekrakt)), built at JEVATHON (TypeSafe AI × The AI Collective), 26 September 2026. Stock data from [e-RaktKosh](https://eraktkosh.mohfw.gov.in), Ministry of Health and Family Welfare. See [NOTICE](NOTICE).
+The e-RaktKosh fetch logic and the September 2026 stock snapshot were adapted from sreeprasad/ekrakt (https://github.com/sreeprasad/ekrakt). That repository has no license file; we credit it and are seeking the author's permission.
+
+Stock data from [e-RaktKosh](https://eraktkosh.mohfw.gov.in), Ministry of Health and Family Welfare. See [NOTICE](NOTICE).
