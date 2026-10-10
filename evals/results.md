@@ -23,8 +23,8 @@ Holds are deliberate refusals to guess. Each held request is counted once, by it
 | Reason | Requests |
 |---|---|
 | no bank passed the reserve/priority/substitution checks | 6 |
-| blood group not fetched from e-RaktKosh (data coverage) | 5 |
 | note unclear: group or units missing or ambiguous | 5 |
+| blood group not fetched from e-RaktKosh (data coverage) | 5 |
 
 ## Cases
 

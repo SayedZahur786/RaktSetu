@@ -35,7 +35,7 @@ raises `FixtureMissing`.
 - `writer.py`: GPT-6.1 Sol via the Responses API, with a template fallback (only file that knows that format)
 - `audit.py`: append-only `out/audit.jsonl`
 - `cli.py`, `__main__.py`: `python -m raktsetu route|demo`
-- `api.py`: FastAPI, `POST /route`, `POST /confirm` (audit only), `GET /`
+- `api.py`: FastAPI, `POST /route`, `POST /confirm` (audit only), `GET /source`, `GET /`
 
 ## Claim -> evidence
 

@@ -54,7 +54,7 @@ The 0.88 s and 6.3 s figures come from one live run on 10 October 2026 (`RAKTSET
 
 Blood bank officers and hospital transfusion services. RaktSetu replaces phone calls and spreadsheet checks with a ranked, explained recommendation that the officer confirms or rejects.
 
-Cost per request: 5.2 Decisions API calls and about 2,360 input tokens on average, which is **$0.000236 per request** at $0.10 per 1M input tokens. The writer (GPT-6.1 Sol) is one more call per request and is not included in that figure. Numbers come from [evals/results.md](evals/results.md).
+Cost per request: 5.2 Decisions API calls and about 2,360 input tokens on average, which is **$0.000236 per request** at an assumed $0.10 per 1M input tokens (the rate given in the hackathon brief, set in `evals/run.py`; not independently sourced). The writer (GPT-6.1 Sol) is one more call per request and is not included in that figure. Numbers come from [evals/results.md](evals/results.md).
 
 ## Quickstart (no API key needed)
 
@@ -113,7 +113,7 @@ Demo scenarios ([data/demo_requests.json](data/demo_requests.json), `python -m r
 | # | Scenario | Result |
 |---|---|---|
 | 1 | Massive transfusion, 2 units O-neg | Government Teaching General Hospital **BLOCKED**: reserve unsafe, plus the code check that 4 units would be left against 6 pending for a trauma case in theatre. NTR Memorial **RECOMMEND** (4 → 2). |
-| 2 | Routine restock, 10 units O-neg | The only bank with 10 O-neg is **BLOCKED**: reserve unsafe and priority defer, with 8 units reserved for tomorrow's surgery. The note says the ward patients are Rh-positive, but `substitution_ok` returns p=0.44, so every O+ bank is **HOLD_FOR_HUMAN** with that one shared value. Earlier, when the question was asked per bank, the same note scored anywhere from 0.51 to 0.96 and the highest-scoring bank got routed; asking once removes that best-of-N effect. The officer decides. |
+| 2 | Routine restock, 10 units O-neg | The only bank with 10 O-neg is **BLOCKED**: reserve unsafe and priority defer, with 8 units reserved for tomorrow's surgery. The note says the ward patients are Rh-positive, but `substitution_ok` returns p=0.44, so every O+ bank is **HOLD_FOR_HUMAN** with that one shared value. Asking the question once per request, rather than once per bank, means a single noisy answer can't be picked as the best of several. The officer decides. |
 | 3 | "need blood asap pls" | **HOLD_FOR_HUMAN**. Sol writes the follow-up question: which group, how many units, what for. |
 | 4 | Decisions API outage | **HOLD_FOR_HUMAN** for every bank. The audit log records the failure reason. |
 
@@ -123,7 +123,7 @@ Demo scenarios ([data/demo_requests.json](data/demo_requests.json), `python -m r
      → parse group and units (code, compat.py)
      → e-RaktKosh stock, live or snapshot (eraktkosh.py)
      → Decisions API, request: urgency (score) + note_ambiguous (predicate)
-     → candidate banks with enough stock; units after dispatch (code)
+     → every bank with stock of the group; too few units → NO_STOCK; units after dispatch (code)
      → groups e-RaktKosh stock is not fetched for → HOLD_FOR_HUMAN (unknown is not zero)
      → Decisions API, one call per bank, concurrent: reserve_check + priority_check (choice)
      → if no exact-group bank passes: compatible substitutes; Rh-positive substitutes need substitution_ok (predicate, asked once per request)
@@ -143,7 +143,7 @@ Code does all arithmetic and enforces the hard limits itself: stock now, stock a
 | Decisions API (`gpt-6-luna`) | Typed judgments with probabilities: urgency (score), reserve safety and priority (choice), substitution and ambiguity (predicate). Refusals are handled. | [src/raktsetu/decide.py](src/raktsetu/decide.py): `OpenAIDecider.ask`, `parse_decision` |
 | GPT-6.1 Sol (Responses API, reasoning effort `low`, JSON schema output) | Writes the bank request, the officer explanation and the follow-up question. The prompt states it cannot change the decision. | [src/raktsetu/writer.py](src/raktsetu/writer.py): `SolWriter.write` |
 
-**Why the Decisions API and not a chat completion:** answers come in fixed types that code can threshold, with a probability for every option, so `p(unsafe) >= 0.5` blocks a dispatch and `p(safe) < 0.7` holds it. Pricing is on input tokens only, which makes it affordable to check every candidate bank, not just the first.
+**Why the Decisions API and not a chat completion:** answers come in fixed types that code can threshold, with a probability for every option, so `p(unsafe) >= 0.5` blocks a dispatch and `p(safe) < 0.7` holds it. If pricing is on input tokens only, as the hackathon brief states (not independently sourced), it is affordable to check every candidate bank, not just the first.
 
 `decide.py` is the only file that knows the Decisions API wire format. The rest of the code works with `QuestionSpec` in and `Verdict` out, so another decision model can be swapped in behind the `Decider` protocol.
 
@@ -161,7 +161,9 @@ Code does all arithmetic and enforces the hard limits itself: stock now, stock a
 - **Pending orders are synthetic.** They come from [data/demo_requests.json](data/demo_requests.json). e-RaktKosh publishes stock, not reservations, so a real deployment needs the bank's own order book.
 - **Coverage is limited.** Only packed red cells, O-negative and O-positive, are fetched; these are the e-RaktKosh group ids verified so far. Requests for any other group are held for the officer, not routed. The default district is East Godavari, Andhra Pradesh, matching the snapshot. Other districts can be tried by setting `ERAKTKOSH_STATE` / `ERAKTKOSH_DISTRICT` (numeric e-RaktKosh codes). Coverage of any other district, including Bengaluru, is not verified.
 - **No locations.** e-RaktKosh returns no coordinates, so ranking never uses distance in practice.
-- **Substitution judgments are conservative and noisy.** Demo 2's note scored p=0.44 on the recorded run, and 0.77–0.88 in earlier probes. Uncertain cases hold, so the officer decides.
+- **Substitution judgments are conservative.** Demo 2's note scored p=0.44 on the recorded run, so it holds. The run-to-run variance is not measured in a committed file.
+- **The audit log on serverless hosts is temporary.** On Vercel it is written to `/tmp`, which is lost when the instance is recycled. A pilot needs durable storage.
+- **The eval's "unsafe" check is limited and the labels are ours.** It counts ROUTED against a non-ROUTED label, a pending-order shortfall at the chosen bank, or an incompatible blood group. The labels are the authors', and 5 were relabelled (see Results).
 - **No authentication on the console.** The officer name is free text. A deployment needs real sign-in.
 - **The eval set is small:** 30 cases, synthetic, labelled by the authors. It shows the gates behave as intended. It is not a clinical validation.
 - **Not a medical device.** RaktSetu does not replace crossmatching, blood bank SOPs or an officer's judgment.

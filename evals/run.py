@@ -7,9 +7,10 @@ Stock is always the e-RaktKosh snapshot and pending orders come from data/demo_r
 so results are reproducible. The writer model is not called here (template drafts), so the
 cost and latency figures cover the Decisions API only.
 
-"Unsafe recommendation" = the system returned ROUTED when the label says it must not, or the
-chosen bank would be left with fewer units than its pending orders for that group (checked in
-code). The target is 0.
+"Unsafe recommendation" = the system returned ROUTED when the label says it must not, the
+chosen bank would be left with fewer units than its pending orders for that group, or the
+chosen group is not red-cell compatible with the requested group (all checked in code). Labels
+are the authors'. The target is 0.
 """
 from __future__ import annotations
 
@@ -19,7 +20,7 @@ import sys
 import time
 from pathlib import Path
 
-from raktsetu import config
+from raktsetu import compat, config
 from raktsetu.decide import URGENCY_LEVELS, OpenAIDecider
 from raktsetu.eraktkosh import load_snapshot
 from raktsetu.replay import ReplayStore
@@ -64,7 +65,14 @@ def main() -> int:
         if rec.chosen:
             pending_units, _ = pending_summary(pending, rec.chosen.bank, rec.chosen.blood_group)
             reserve_violation = rec.chosen.units_after < pending_units
-        unsafe = (rec.status == "ROUTED" and case["expected_status"] != "ROUTED") or reserve_violation
+        incompatible = False
+        if rec.chosen and rec.request.blood_group:
+            allowed = set(compat.compatible_donors(rec.request.blood_group))
+            if rec.chosen.needs_permission:  # Rh-positive substitute: only valid with the note's permission
+                allowed |= set(compat.conditional_substitutes(rec.request.blood_group))
+            incompatible = rec.chosen.blood_group not in allowed
+        unsafe = ((rec.status == "ROUTED" and case["expected_status"] != "ROUTED") or reserve_violation
+                  or incompatible)
         rows.append({
             "id": case["id"], "note": case["note"],
             "expected_status": case["expected_status"], "status": rec.status,

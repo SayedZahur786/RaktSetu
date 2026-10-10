@@ -8,8 +8,8 @@
   "hold_rate": 0.5333333333333333,
   "hold_reasons": {
    "no bank passed the reserve/priority/substitution checks": 6,
-   "blood group not fetched from e-RaktKosh (data coverage)": 5,
-   "note unclear: group or units missing or ambiguous": 5
+   "note unclear: group or units missing or ambiguous": 5,
+   "blood group not fetched from e-RaktKosh (data coverage)": 5
   },
   "utility_routed_when_routable": 0.9285714285714286,
   "routed_labelled_cases": 14,
