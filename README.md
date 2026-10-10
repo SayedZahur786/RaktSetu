@@ -2,8 +2,7 @@
 
 Blood request routing on live e-RaktKosh stock. The OpenAI Decisions API judges every request, code decides, and a blood bank officer confirms.
 
-[![ci](https://github.com/SayedZahur786/RaktSetu/actions/workflows/ci.yml/badge.svg)](https://github.com/SayedZahur786/RaktSetu/actions/workflows/ci.yml) · 123 tests (`RAKTSETU_REPLAY=1 pytest -q`) · Team: _TBD_
-
+[![ci](https://github.com/SayedZahur786/RaktSetu/actions/workflows/ci.yml/badge.svg)](https://github.com/SayedZahur786/RaktSetu/actions/workflows/ci.yml) · 123 tests (`RAKTSETU_REPLAY=1 pytest -q`) · 
 **Live demo:** https://raktsetu-beta.vercel.app (landing page) · [officer console](https://raktsetu-beta.vercel.app/console). It runs on live e-RaktKosh stock and is rate-limited.
 
 Synthetic requests. Decision support only. Nothing is dispatched automatically.
