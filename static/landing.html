@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RaktSetu · Blood Request Routing</title>
+<meta name="description" content="RaktSetu checks every blood bank in the district from live e-RaktKosh stock and returns a ranked, explained recommendation in seconds. A blood bank officer confirms.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M16 3C16 3 6 15 6 21a10 10 0 0 0 20 0C26 15 16 3 16 3z' fill='%23b42318'/></svg>">
+<style>
+  :root {
+    --bg:#faf9f7; --bg2:#f2f0ec; --fg:#1b1a18; --muted:#5f5d58; --line:#e2dfd9; --card:#ffffff;
+    --accent:#b42318; --accent-ink:#ffffff; --accent-soft:#fbe9e7; --ok:#1f7a4d; --hold:#9a6700; --block:#b42318;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#121211; --bg2:#1a1a18; --fg:#ecebe6; --muted:#a3a29c; --line:#2f2e2b; --card:#1c1c1a;
+      --accent:#f0675a; --accent-ink:#1b0a08; --accent-soft:#2a1714; --ok:#4cc38a; --hold:#e0b341; --block:#f97066;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg:#121211; --bg2:#1a1a18; --fg:#ecebe6; --muted:#a3a29c; --line:#2f2e2b; --card:#1c1c1a;
+    --accent:#f0675a; --accent-ink:#1b0a08; --accent-soft:#2a1714; --ok:#4cc38a; --hold:#e0b341; --block:#f97066;
+  }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+  a { color:inherit; }
+  .wrap { max-width:1080px; margin:0 auto; padding:0 20px; }
+  .notice { background:var(--fg); color:var(--bg); font-size:13px; text-align:center; padding:7px 16px; }
+  nav { position:sticky; top:0; z-index:5; background:color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter:blur(8px); border-bottom:1px solid var(--line); }
+  nav .wrap { display:flex; align-items:center; gap:24px; height:60px; }
+  .brand { font-weight:750; letter-spacing:-.01em; text-decoration:none; display:flex; align-items:center; gap:8px; font-size:18px; }
+  .brand svg { width:20px; height:20px; }
+  .links { display:flex; gap:20px; margin-left:auto; font-size:14px; }
+  .links a { text-decoration:none; color:var(--muted); }
+  .links a:hover { color:var(--fg); }
+  .btn { display:inline-flex; align-items:center; gap:8px; padding:11px 18px; border-radius:8px; font-weight:650; text-decoration:none; font-size:15px; border:1px solid transparent; white-space:nowrap; }
+  .btn-primary { background:var(--accent); color:var(--accent-ink); }
+  .btn-primary:hover { filter:brightness(1.08); }
+  .btn-ghost { border-color:var(--line); background:var(--card); }
+  .btn-sm { padding:7px 14px; font-size:14px; }
+  header.hero { padding:72px 0 56px; }
+  .eyebrow { color:var(--accent); font-weight:650; font-size:13px; letter-spacing:.08em; text-transform:uppercase; }
+  h1 { font-size:clamp(34px, 5.6vw, 58px); line-height:1.06; letter-spacing:-.025em; margin:12px 0 18px; max-width:880px; }
+  .lede { font-size:clamp(17px, 2vw, 20px); color:var(--muted); max-width:720px; margin:0 0 28px; }
+  .cta { display:flex; gap:12px; flex-wrap:wrap; }
+  .hero-stats { display:grid; grid-template-columns:repeat(4, 1fr); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:12px; overflow:hidden; margin-top:48px; }
+  .hero-stats div { background:var(--card); padding:18px 20px; }
+  .num { font-size:28px; font-weight:750; letter-spacing:-.02em; display:block; }
+  .lbl { font-size:13px; color:var(--muted); }
+  section { padding:64px 0; border-top:1px solid var(--line); }
+  section.alt { background:var(--bg2); }
+  h2 { font-size:clamp(26px, 3.4vw, 36px); letter-spacing:-.02em; margin:6px 0 14px; line-height:1.15; }
+  .sub { color:var(--muted); max-width:720px; margin:0 0 28px; }
+  .grid3 { display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:22px; }
+  .card .num { color:var(--accent); }
+  .card p { margin:8px 0 0; color:var(--muted); font-size:15px; }
+  .src { font-size:12px; color:var(--muted); margin-top:10px; display:block; }
+  .scroll { overflow-x:auto; border:1px solid var(--line); border-radius:12px; background:var(--card); }
+  table { width:100%; border-collapse:collapse; font-size:15px; }
+  th, td { text-align:left; padding:14px 16px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-weight:650; }
+  tr:last-child td { border-bottom:0; }
+  .same { color:var(--muted); }
+  .win { font-weight:650; }
+  ol.steps { list-style:none; padding:0; margin:0; display:grid; grid-template-columns:repeat(5, 1fr); gap:12px; counter-reset:s; }
+  ol.steps li { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:18px; counter-increment:s; font-size:14px; color:var(--muted); }
+  ol.steps li::before { content:counter(s); display:inline-grid; place-items:center; width:26px; height:26px; border-radius:50%; background:var(--accent-soft); color:var(--accent); font-weight:700; font-size:13px; margin-bottom:10px; }
+  ol.steps b { display:block; color:var(--fg); font-size:15px; margin-bottom:4px; }
+  .who { font-size:12px; font-weight:650; letter-spacing:.04em; text-transform:uppercase; margin-top:10px; display:block; }
+  .who.code { color:var(--ok); } .who.ai { color:var(--accent); } .who.human { color:var(--hold); }
+  .chips { display:flex; gap:8px; flex-wrap:wrap; margin:18px 0 0; }
+  .chip { font-size:12px; font-weight:700; padding:3px 10px; border-radius:999px; border:1px solid currentColor; }
+  .c-ok { color:var(--ok); } .c-hold { color:var(--hold); } .c-block { color:var(--block); } .c-none { color:var(--muted); }
+  ul.clean { list-style:none; padding:0; margin:0; display:grid; gap:12px; }
+  ul.clean li { padding-left:26px; position:relative; color:var(--muted); }
+  ul.clean li::before { content:""; position:absolute; left:4px; top:9px; width:9px; height:9px; border-radius:2px; background:var(--accent); }
+  ul.clean li b { color:var(--fg); }
+  .two { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+  code { font:13px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; background:var(--bg2); border:1px solid var(--line); padding:1px 6px; border-radius:5px; }
+  .final { text-align:center; padding:80px 0; }
+  .final .cta { justify-content:center; }
+  footer { border-top:1px solid var(--line); padding:28px 0 40px; font-size:13px; color:var(--muted); }
+  footer a { color:var(--muted); }
+  @media (max-width: 860px) {
+    .hero-stats { grid-template-columns:repeat(2, 1fr); }
+    .grid3, .two { grid-template-columns:1fr; }
+    ol.steps { grid-template-columns:1fr; }
+    .links a:not(.btn) { display:none; }
+    header.hero { padding:48px 0 40px; }
+  }
+</style>
+</head>
+<body>
+<div class="notice">Pilot-ready, not production-certified. Synthetic requests. Decision support only: nothing is dispatched without an officer.</div>
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="RaktSetu home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3C16 3 6 15 6 21a10 10 0 0 0 20 0C26 15 16 3 16 3z" fill="var(--accent)"/></svg>
+      RaktSetu
+    </a>
+    <div class="links">
+      <a href="#problem">Problem</a>
+      <a href="#how">How it works</a>
+      <a href="#results">Results</a>
+      <a href="#safety">Safety</a>
+      <a href="https://github.com/SayedZahur786/RaktSetu">GitHub</a>
+      <a class="btn btn-primary btn-sm" href="/console">Usage →</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div class="eyebrow">Blood request routing · live e-RaktKosh stock</div>
+    <h1>Find the right blood bank in seconds, not hours.</h1>
+    <p class="lede">RaktSetu reads live stock from India's national blood bank network and checks every bank in the district against the hospital's note. It returns a ranked, explained recommendation. The OpenAI Decisions API judges, code decides, and a blood bank officer confirms.</p>
+    <div class="cta">
+      <a class="btn btn-primary" href="/console">Try it live: open the console →</a>
+      <a class="btn btn-ghost" href="https://github.com/SayedZahur786/RaktSetu">View the code</a>
+    </div>
+    <div class="hero-stats">
+      <div><span class="num">16 banks</span><span class="lbl">read live in 0.88 s</span></div>
+      <div><span class="num">6.3 s</span><span class="lbl">p50 to a ranked, explained answer (n=5 live)</span></div>
+      <div><span class="num">0</span><span class="lbl">unsafe recommendations across 30 eval cases</span></div>
+      <div><span class="num">$0.000236</span><span class="lbl">Decisions API cost per request</span></div>
+    </div>
+  </div>
+</header>
+
+<section id="problem">
+  <div class="wrap">
+    <div class="eyebrow">The problem</div>
+    <h2>In a haemorrhage, the first delay is finding the blood.</h2>
+    <p class="sub">Stock is spread across many small banks. The context that should decide who gets scarce O-negative lives in free-text notes, which a stock spreadsheet cannot read.</p>
+    <div class="grid3">
+      <div class="card">
+        <span class="num">1–6 hours</span>
+        <p>Obstetric providers in Bihar estimated they wait one to six hours to receive blood; at least two hours to get it from another medical college.</p>
+        <a class="src" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6493310/">Global Health Action, 2019 ↗</a>
+      </div>
+      <div class="card">
+        <span class="num">30.9 min</span>
+        <p>Mean emergency issue time inside one bank, from request to blood leaving: 125 cases, Government Medical College Trivandrum.</p>
+        <a class="src" href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4455105/">Asian J. Transfusion Science 2015 (abstract) ↗</a>
+      </div>
+      <div class="card">
+        <span class="num">15% short</span>
+        <p>India's annual collection fell 15% below the WHO 1%-of-population norm, across 2,903 blood banks (March 2018).</p>
+        <a class="src" href="https://factly.in/blood-collection-increases-by-12-in-4-years-still-15-short-of-requirement">Factly, 2018 ↗</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="alt" id="before-after">
+  <div class="wrap">
+    <div class="eyebrow">Before and after</div>
+    <h2>RaktSetu changes the search step. Nothing else.</h2>
+    <p class="sub">The bank's own issue time and transport stay the same, and the officer still decides.</p>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Step</th><th>Before</th><th>With RaktSetu</th></tr></thead>
+        <tbody>
+          <tr><td>Find a bank with compatible stock</td><td>1–6 hours of calls and runners</td><td class="win">All 16 district banks read live in 0.88 s; ranked answer in 6.3 s p50</td></tr>
+          <tr><td>Check it is safe to take that stock</td><td>A phone conversation, if at all</td><td class="win">Reserve and priority judged per bank; pending-order arithmetic in code</td></tr>
+          <tr><td>Bank issues the blood</td><td>~31 min mean</td><td class="same">Unchanged</td></tr>
+          <tr><td>Transport to the patient</td><td>Distance, roads, timetables</td><td class="same">Unchanged</td></tr>
+          <tr><td>Decision to dispatch</td><td>Whoever is on the phone</td><td class="same">Unchanged: an officer confirms</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="eyebrow">How it works</div>
+    <h2>The model judges. Code decides. An officer confirms.</h2>
+    <p class="sub">Every number (stock now, stock after dispatch, units already pending, ABO/Rh compatibility) is computed in code and given to the model as fact.</p>
+    <ol class="steps">
+      <li><b>Read the request</b>Group and units parsed from the note. Ambiguous means hold.<span class="who code">Code</span></li>
+      <li><b>Pull live stock</b>Every bank in the district from e-RaktKosh.<span class="who code">Code</span></li>
+      <li><b>Judge</b>Urgency, reserve safety, priority conflicts and substitution, with a probability for every answer.<span class="who ai">Decisions API</span></li>
+      <li><b>Decide and rank</b>Thresholds from <code>policy.yaml</code>. Blocked banks stay visible with the reason.<span class="who code">Code</span></li>
+      <li><b>Explain and confirm</b>GPT-6.1 Sol drafts the bank request and the officer's explanation. The officer confirms.<span class="who human">Officer</span></li>
+    </ol>
+    <div class="chips" aria-label="Candidate statuses">
+      <span class="chip c-ok">RECOMMEND</span><span class="chip c-hold">HOLD_FOR_HUMAN</span><span class="chip c-block">BLOCKED</span><span class="chip c-none">NO_STOCK</span>
+    </div>
+  </div>
+</section>
+
+<section class="alt" id="results">
+  <div class="wrap">
+    <div class="eyebrow">Results</div>
+    <h2>Measured, reproducible, offline.</h2>
+    <p class="sub">30 synthetic, hand-labelled requests against real e-RaktKosh stock. Recorded live, and the same results replay offline with no API key.</p>
+    <div class="grid3">
+      <div class="card"><span class="num">0</span><p>Unsafe recommendations. The check covers wrong-status routing, pending-order shortfalls and incompatible blood groups.</p></div>
+      <div class="card"><span class="num">97%</span><p>Status accuracy (29/30) and urgency accuracy. The one miss held a request it could have routed, the safe direction.</p></div>
+      <div class="card"><span class="num">93%</span><p>Utility: routable requests actually routed (13/14).</p></div>
+      <div class="card"><span class="num">166 ms</span><p>p50 per Decisions API call, 5.2 calls per request.</p></div>
+      <div class="card"><span class="num">53%</span><p>Held for a human. These are deliberate refusals to guess: safety checks (6), data coverage (5), unclear notes (5).</p></div>
+      <div class="card"><span class="num">123</span><p>Tests passing in CI with no keys and no network.</p></div>
+    </div>
+    <span class="src">Sources: <a href="https://github.com/SayedZahur786/RaktSetu/blob/main/evals/results.md">evals/results.md</a> · <a href="https://github.com/SayedZahur786/RaktSetu/blob/main/evals/latency.json">evals/latency.json</a></span>
+  </div>
+</section>
+
+<section id="safety">
+  <div class="wrap two">
+    <div>
+      <div class="eyebrow">Safety</div>
+      <h2>Fails closed, every time.</h2>
+      <ul class="clean">
+        <li><b>Any error, refusal or malformed answer</b> ends in HOLD_FOR_HUMAN, never RECOMMEND.</li>
+        <li><b>If the live stock fetch fails</b>, nothing is recommended from the old snapshot.</li>
+        <li><b>Never empties a bank</b>, and never leaves less than pending orders already need.</li>
+        <li><b>No automatic dispatch.</b> Confirm writes to an audit log, with overrides flagged.</li>
+      </ul>
+    </div>
+    <div>
+      <div class="eyebrow">Built on OpenAI</div>
+      <h2>Typed judgments, not chat.</h2>
+      <ul class="clean">
+        <li><b>Decisions API (gpt-6-luna):</b> urgency score, reserve and priority choices, substitution and ambiguity predicates, with a probability per option that code can threshold.</li>
+        <li><b>GPT-6.1 Sol (Responses API):</b> writes the bank request, the explanation and the follow-up question. It cannot change the decision.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="alt" id="ready">
+  <div class="wrap two">
+    <div>
+      <div class="eyebrow">Ready to use</div>
+      <h2>Pilot-ready today.</h2>
+      <ul class="clean">
+        <li><b>Reads the Health Ministry's live e-RaktKosh API</b> directly.</li>
+        <li><b>Works for any district e-RaktKosh covers.</b> Set two codes; no code change.</li>
+        <li><b>Integrate</b> through <code>POST /route</code> and <code>POST /confirm</code>, or the CLI.</li>
+      </ul>
+    </div>
+    <div>
+      <div class="eyebrow">Not yet</div>
+      <h2>Honest limits.</h2>
+      <ul class="clean">
+        <li>Does not place orders in a bank's own system or move blood.</li>
+        <li>Fetches O-negative and O-positive only; other groups go to the officer.</li>
+        <li>Pending orders are synthetic; e-RaktKosh publishes stock, not reservations.</li>
+        <li>No sign-in yet. Not a medical device.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="final">
+  <div class="wrap">
+    <h2>See a real routing decision on live stock.</h2>
+    <p class="sub" style="margin:0 auto 28px">Paste a hospital request and get ranked banks, every verdict with its probability, and a drafted request. The officer stays in charge.</p>
+    <div class="cta">
+      <a class="btn btn-primary" href="/console">Open the console →</a>
+      <a class="btn btn-ghost" href="https://github.com/SayedZahur786/RaktSetu#quickstart-no-api-key-needed">Run it offline</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    Extends Blood Bank Router (<a href="https://github.com/sreeprasad/ekrakt">sreeprasad/ekrakt</a>), built at JEVATHON, 26 September 2026. Stock data from <a href="https://eraktkosh.mohfw.gov.in">e-RaktKosh</a>, Ministry of Health and Family Welfare. Not affiliated with the Ministry. Public demo is rate-limited.
+  </div>
+</footer>
+</body>
+</html>

@@ -53,7 +53,9 @@ def test_empty_text_rejected(policy, tmp_path):
     assert c.post("/route", json={"text": ""}).status_code == 422
 
 
-def test_index_served(policy, tmp_path):
+def test_landing_and_console_served(policy, tmp_path):
     c, _ = client(policy, tmp_path)
-    r = c.get("/")
-    assert r.status_code == 200 and "Decision support only" in r.text
+    landing = c.get("/")
+    assert landing.status_code == 200 and 'href="/console"' in landing.text
+    console = c.get("/console")
+    assert console.status_code == 200 and "Decision support only" in console.text

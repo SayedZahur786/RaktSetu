@@ -1,4 +1,4 @@
-"""FastAPI officer console: POST /route, POST /confirm, GET /source, GET / (static/index.html).
+"""FastAPI app: GET / (landing page), GET /console (officer console), POST /route, POST /confirm, GET /source.
 
 /confirm never dispatches anything. It appends a CONFIRMED line to the audit log, and only
 for a candidate this server returned as RECOMMEND or HOLD_FOR_HUMAN. That proof travels as
@@ -33,7 +33,8 @@ from .router import Router, build_router, parse_request, stock_for_run
 
 log = logging.getLogger(__name__)
 
-INDEX = config.ROOT / "static" / "index.html"
+LANDING = config.ROOT / "static" / "landing.html"
+CONSOLE = config.ROOT / "static" / "index.html"
 STOCK_TTL_S = 600
 TOKEN_TTL_S = 3600
 CONFIRMABLE = {"RECOMMEND", "HOLD_FOR_HUMAN"}
@@ -131,8 +132,12 @@ def create_app(router_factory: Callable[[bool], Router] = lambda outage: build_r
     signer = TokenSigner(secret or config.signing_key() or secrets.token_bytes(32))
 
     @app.get("/", include_in_schema=False)
-    def index() -> FileResponse:
-        return FileResponse(INDEX)
+    def landing() -> FileResponse:
+        return FileResponse(LANDING)
+
+    @app.get("/console", include_in_schema=False)
+    def console() -> FileResponse:
+        return FileResponse(CONSOLE)
 
     @app.get("/source")
     def source() -> dict[str, str]:
