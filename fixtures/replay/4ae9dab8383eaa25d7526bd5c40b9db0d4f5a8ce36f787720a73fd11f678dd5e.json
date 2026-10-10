@@ -1,0 +1,59 @@
+{
+ "latency_ms": 4746.4,
+ "recorded_at": "2026-10-10T12:26:16",
+ "request": {
+  "api": "responses.create",
+  "input": "{\"chosen\": null, \"data_source\": \"snapshot e-RaktKosh, East Godavari, Andhra Pradesh, 2026-09-26T05:19:57\", \"other_candidates\": [{\"bank\": \"Dr. Ysr-Jakkampudi Rammohan Rao Blood Centre\", \"dispensed_group\": \"O-\", \"exact_match\": true, \"pending_at_bank\": \"8u O-: Tomorrow 09:00: 41F, typed O-negative, placenta accreta for planned caesarean hysterectomy, history of massive haemorrhage. 8 units O-neg reserved for her.\", \"reasons\": [\"request held before per-bank checks\"], \"status\": \"HOLD_FOR_HUMAN\", \"units_after_dispatch\": 10, \"units_now\": 12, \"verdicts\": {}}, {\"bank\": \"Government Teaching General Hospital Blood Centre, Rajahmundry\", \"dispensed_group\": \"O-\", \"exact_match\": true, \"pending_at_bank\": \"6u O-: Trauma theatre now: 24M road-traffic polytrauma with splenic rupture, typed O-negative, haemodynamically unstable. Massive transfusion protocol on standby; all 6 O-neg units earmarked for this patient.\", \"reasons\": [\"request held before per-bank checks\"], \"status\": \"HOLD_FOR_HUMAN\", \"units_after_dispatch\": 4, \"units_now\": 6, \"verdicts\": {}}, {\"bank\": \"Ntr Memorial Trust Blood Centre Rajamahendravaram\", \"dispensed_group\": \"O-\", \"exact_match\": true, \"pending_at_bank\": \"none\", \"reasons\": [\"request held before per-bank checks\"], \"status\": \"HOLD_FOR_HUMAN\", \"units_after_dispatch\": 2, \"units_now\": 4, \"verdicts\": {}}], \"request\": {\"blood_group\": \"O-\", \"hospital\": \"Area Hospital, Rajahmundry (labour ward)\", \"id\": \"demo4\", \"note\": \"2 units O-negative needed now. Massive transfusion protocol activated: 29F post-partum haemorrhage after caesarean, patient typed O-negative, ongoing bleeding.\", \"units\": 2}, \"status\": \"HOLD_FOR_HUMAN\", \"status_reasons\": [\"decision call failed: ConnectionError: simulated Decisions API outage\"], \"urgency\": null}",
+  "instructions": "You write for RaktSetu, a blood request router used by blood bank officers in India.\nThe routing decision below is FINAL. It was made by code from typed model judgments and fixed thresholds.\nYou cannot change it, add candidates, or second-guess it; you only explain it and draft text.\n\nReturn JSON with exactly these fields:\n- bank_request: a short, formal request to the chosen bank (requested group, units, urgency, requesting\n  hospital). If no bank was chosen, write one sentence saying no request is being sent and why.\n- officer_explanation: 2-3 sentences for the officer citing the verdicts and computed facts given\n  (stock now/after, reserve and priority verdicts, substitution if any). State that an officer must confirm.\n- follow_up_question: only if status is HOLD_FOR_HUMAN because the request note is missing or unclear\n  (ambiguous note, blood group or units not stated): the single question to ask the requesting hospital,\n  covering which blood group, how many units, and for what clinical reason. Otherwise null.\nPlain text inside each field. No markdown. Do not invent facts not present in the input.",
+  "model": "gpt-6.1-sol",
+  "reasoning": {
+   "effort": "low"
+  },
+  "text": {
+   "format": {
+    "name": "raktsetu_draft",
+    "schema": {
+     "additionalProperties": false,
+     "properties": {
+      "bank_request": {
+       "type": "string"
+      },
+      "follow_up_question": {
+       "type": [
+        "string",
+        "null"
+       ]
+      },
+      "officer_explanation": {
+       "type": "string"
+      }
+     },
+     "required": [
+      "bank_request",
+      "officer_explanation",
+      "follow_up_question"
+     ],
+     "type": "object"
+    },
+    "strict": true,
+    "type": "json_schema"
+   }
+  }
+ },
+ "response": {
+  "model": "gpt-6.1-sol",
+  "output_text": "{\"bank_request\":\"No request is being sent for Area Hospital, Rajahmundry (labour ward) because routing is HOLD_FOR_HUMAN following a Decisions API connection failure.\",\"officer_explanation\":\"The request specifies 2 units of O-negative needed now for ongoing post-partum haemorrhage, but the decision call failed and all candidates were held before per-bank checks; no reserve or priority verdicts were produced. The reported O-negative stock now/after dispatch is 12/10 units at Dr. Ysr-Jakkampudi Rammohan Rao Blood Centre, 6/4 at Government Teaching General Hospital Blood Centre, Rajahmundry, and 4/2 at Ntr Memorial Trust Blood Centre Rajamahendravaram; all are exact matches, with no substitution proposed. An officer must confirm before any request is sent.\",\"follow_up_question\":null}",
+  "usage": {
+   "input_tokens": 807,
+   "input_tokens_details": {
+    "cache_write_tokens": 0,
+    "cached_tokens": 0
+   },
+   "output_tokens": 190,
+   "output_tokens_details": {
+    "reasoning_tokens": 0
+   },
+   "total_tokens": 997
+  }
+ }
+}

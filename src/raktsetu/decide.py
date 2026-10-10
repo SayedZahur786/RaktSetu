@@ -66,8 +66,8 @@ PRIORITY_CHECK = QuestionSpec(
 def substitution_question(substitute: BloodGroup, requested: BloodGroup) -> QuestionSpec:
     return QuestionSpec(
         name="substitution_ok", kind="predicate",
-        instructions=f"The note permits giving {substitute} red cells instead of {requested}: it states the patients' "
-                     f"own blood group or Rh type in a way that makes {substitute} compatible.")
+        instructions=f"The note indicates that the patients this blood is for can safely receive {substitute} red "
+                     f"cells instead of {requested}, for example because it says they are Rh-positive.")
 
 
 def candidate_questions(substitute: BloodGroup | None, requested: BloodGroup) -> list[QuestionSpec]:

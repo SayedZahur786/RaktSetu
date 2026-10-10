@@ -1,0 +1,59 @@
+{
+ "latency_ms": 4237.7,
+ "recorded_at": "2026-10-10T12:25:21",
+ "request": {
+  "api": "responses.create",
+  "input": "{\"chosen\": {\"bank\": \"Ntr Memorial Trust Blood Centre Rajamahendravaram\", \"dispensed_group\": \"O-\", \"exact_match\": true, \"pending_at_bank\": \"none\", \"reasons\": [\"all checks passed\"], \"status\": \"RECOMMEND\", \"units_after_dispatch\": 2, \"units_now\": 4, \"verdicts\": {\"priority_check\": \"proceed (p=1.00)\", \"reserve_check\": \"safe (p=1.00)\"}}, \"data_source\": \"snapshot e-RaktKosh, East Godavari, Andhra Pradesh, 2026-09-26T05:19:57\", \"other_candidates\": [{\"bank\": \"Dr. Ysr-Jakkampudi Rammohan Rao Blood Centre\", \"dispensed_group\": \"O-\", \"exact_match\": true, \"pending_at_bank\": \"8u O-: Tomorrow 09:00: 41F, typed O-negative, placenta accreta for planned caesarean hysterectomy, history of massive haemorrhage. 8 units O-neg reserved for her.\", \"reasons\": [\"reserve_check safe (p(safe)=0.64 < 0.7)\"], \"status\": \"HOLD_FOR_HUMAN\", \"units_after_dispatch\": 10, \"units_now\": 12, \"verdicts\": {\"priority_check\": \"proceed (p=0.96)\", \"reserve_check\": \"safe (p=0.64)\"}}, {\"bank\": \"Government Teaching General Hospital Blood Centre, Rajahmundry\", \"dispensed_group\": \"O-\", \"exact_match\": true, \"pending_at_bank\": \"6u O-: Trauma theatre now: 24M road-traffic polytrauma with splenic rupture, typed O-negative, haemodynamically unstable. Massive transfusion protocol on standby; all 6 O-neg units earmarked for this patient.\", \"reasons\": [\"reserve_check unsafe (p=1.00)\"], \"status\": \"BLOCKED\", \"units_after_dispatch\": 4, \"units_now\": 6, \"verdicts\": {\"priority_check\": \"proceed (p=0.78)\", \"reserve_check\": \"unsafe (p=1.00)\"}}], \"request\": {\"blood_group\": \"O-\", \"hospital\": \"Area Hospital, Rajahmundry (labour ward)\", \"id\": \"demo1\", \"note\": \"2 units O-negative needed now. Massive transfusion protocol activated: 29F post-partum haemorrhage after caesarean, patient typed O-negative, ongoing bleeding.\", \"units\": 2}, \"status\": \"ROUTED\", \"status_reasons\": [], \"urgency\": \"massive transfusion or life-threatening\"}",
+  "instructions": "You write for RaktSetu, a blood request router used by blood bank officers in India.\nThe routing decision below is FINAL. It was made by code from typed model judgments and fixed thresholds.\nYou cannot change it, add candidates, or second-guess it; you only explain it and draft text.\n\nReturn JSON with exactly these fields:\n- bank_request: a short, formal request to the chosen bank (requested group, units, urgency, requesting\n  hospital). If no bank was chosen, write one sentence saying no request is being sent and why.\n- officer_explanation: 2-3 sentences for the officer citing the verdicts and computed facts given\n  (stock now/after, reserve and priority verdicts, substitution if any). State that an officer must confirm.\n- follow_up_question: only if status is HOLD_FOR_HUMAN because the request note is missing or unclear\n  (ambiguous note, blood group or units not stated): the single question to ask the requesting hospital,\n  covering which blood group, how many units, and for what clinical reason. Otherwise null.\nPlain text inside each field. No markdown. Do not invent facts not present in the input.",
+  "model": "gpt-6.1-sol",
+  "reasoning": {
+   "effort": "low"
+  },
+  "text": {
+   "format": {
+    "name": "raktsetu_draft",
+    "schema": {
+     "additionalProperties": false,
+     "properties": {
+      "bank_request": {
+       "type": "string"
+      },
+      "follow_up_question": {
+       "type": [
+        "string",
+        "null"
+       ]
+      },
+      "officer_explanation": {
+       "type": "string"
+      }
+     },
+     "required": [
+      "bank_request",
+      "officer_explanation",
+      "follow_up_question"
+     ],
+     "type": "object"
+    },
+    "strict": true,
+    "type": "json_schema"
+   }
+  }
+ },
+ "response": {
+  "model": "gpt-6.1-sol",
+  "output_text": "{\"bank_request\":\"To Ntr Memorial Trust Blood Centre Rajamahendravaram: Please urgently provide 2 units of O-negative blood to Area Hospital, Rajahmundry (labour ward), for life-threatening post-partum haemorrhage with ongoing bleeding; massive transfusion protocol is activated.\",\"officer_explanation\":\"Ntr Memorial Trust Blood Centre Rajamahendravaram is recommended with all checks passed: O-negative is an exact match, with 4 units now and 2 remaining after dispatch, and no pending request at the bank. The reserve verdict is safe (p=1.00) and the priority verdict is proceed (p=1.00); no substitution is involved. An officer must confirm before dispatch.\",\"follow_up_question\":null}",
+  "usage": {
+   "input_tokens": 882,
+   "input_tokens_details": {
+    "cache_write_tokens": 0,
+    "cached_tokens": 0
+   },
+   "output_tokens": 165,
+   "output_tokens_details": {
+    "reasoning_tokens": 0
+   },
+   "total_tokens": 1047
+  }
+ }
+}
