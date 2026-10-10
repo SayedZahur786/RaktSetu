@@ -1,4 +1,4 @@
-"""e-RaktKosh stock: live client (ported from ekrakt's agent.py) plus the cached snapshot.
+"""e-RaktKosh stock: live client plus the cached snapshot.
 
 The only file that knows the e-RaktKosh wire format. Live fetch falls back to the snapshot
 on any failure or an empty district, and the returned StockSnapshot says which was used.
