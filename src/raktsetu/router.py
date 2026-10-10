@@ -5,6 +5,7 @@ decision model only sees computed facts as text. Every failure path ends in HOLD
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import re
@@ -49,8 +50,15 @@ def load_demo(path: Path = DEMO_FILE) -> DemoData:
     return DemoData.model_validate(json.loads(path.read_text()))
 
 
-def parse_request(request_id: str, note: str, hospital: str | None = None) -> Request:
+def content_request_id(note: str, hospital: str | None) -> str:
+    """Stable id for an ad-hoc request, so identical requests replay from the same fixtures."""
+    digest = hashlib.sha256(f"{hospital or ''}\n{note.strip()}".encode("utf-8")).hexdigest()
+    return f"req-{digest[:10]}"
+
+
+def parse_request(request_id: str | None, note: str, hospital: str | None = None) -> Request:
     """Structured fields come from code. Unparseable fields stay None and force a hold."""
+    request_id = request_id or content_request_id(note, hospital)
     m = _UNITS_RE.search(note)
     n = int(m.group(1) or m.group(2)) if m else 0
     units = n if n > 0 else None

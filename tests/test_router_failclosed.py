@@ -142,3 +142,9 @@ def test_outage_reason_reaches_audit_log(policy, tmp_path):
     first = json.loads((tmp_path / "audit.jsonl").read_text().splitlines()[0])
     assert first["status"] == "HOLD_FOR_HUMAN"
     assert "simulated Decisions API outage" in first["reasons"][0]
+
+
+def test_adhoc_request_id_is_stable_for_replay():
+    a = parse_request(None, " 2 units O-negative ", "H")
+    assert a.id == parse_request(None, "2 units O-negative", "H").id
+    assert a.id != parse_request(None, "2 units O-negative", "Other").id

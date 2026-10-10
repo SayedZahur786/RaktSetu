@@ -4,7 +4,6 @@ from __future__ import annotations
 import argparse
 import logging
 import sys
-import time
 
 from .models import Candidate, Recommendation
 from .replay import FixtureMissing
@@ -72,7 +71,7 @@ def cmd_route(args: argparse.Namespace) -> int:
             return 2
         req, outage = parse_request(sc.id, sc.note, sc.hospital), args.simulate_outage or sc.simulate_outage
     else:
-        req, outage = parse_request(f"req-{int(time.time())}", args.text, args.hospital), args.simulate_outage
+        req, outage = parse_request(None, args.text, args.hospital), args.simulate_outage
     rec = build_router(simulate_outage=outage).route(req, stock)
     print_recommendation(rec)
     return 0

@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RaktSetu Officer Console</title>
+<style>
+  :root { --bg:#f7f7f5; --fg:#1d1d1b; --muted:#6b6b66; --card:#fff; --line:#e3e2dd;
+          --ok:#1f7a4d; --hold:#9a6700; --block:#b42318; --none:#6b6b66; --accent:#8b1a1a; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#151514; --fg:#ecebe6; --muted:#a3a29c; --card:#1e1e1c; --line:#33332f;
+            --ok:#4cc38a; --hold:#e0b341; --block:#f97066; --none:#a3a29c; --accent:#f28b82; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.5 system-ui, sans-serif; }
+  .banner { background:var(--accent); color:#fff; padding:8px 16px; font-weight:600; text-align:center; }
+  main { max-width:1100px; margin:0 auto; padding:16px; }
+  h1 { font-size:22px; margin:8px 0 2px; }
+  .muted { color:var(--muted); font-size:13px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:16px; margin:16px 0; }
+  textarea, input[type=text] { width:100%; padding:8px; border:1px solid var(--line); border-radius:6px;
+                               background:var(--bg); color:var(--fg); font:inherit; }
+  textarea { min-height:80px; }
+  .row { display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-top:8px; }
+  .row > input[type=text] { flex:1 1 220px; }
+  button { padding:8px 14px; border:0; border-radius:6px; background:var(--fg); color:var(--bg); font:inherit;
+           font-weight:600; cursor:pointer; }
+  button:disabled { opacity:.5; cursor:default; }
+  .chip { display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; font-weight:700;
+          border:1px solid currentColor; white-space:nowrap; }
+  .ROUTED, .RECOMMEND { color:var(--ok); } .HOLD_FOR_HUMAN { color:var(--hold); }
+  .BLOCKED { color:var(--block); } .NO_STOCK { color:var(--none); }
+  .scroll { overflow-x:auto; }
+  table { border-collapse:collapse; width:100%; font-size:14px; }
+  th, td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { color:var(--muted); font-weight:600; font-size:12px; text-transform:uppercase; }
+  .reasons { color:var(--muted); font-size:12px; }
+  .err { color:var(--block); }
+</style>
+</head>
+<body>
+<div class="banner">Synthetic requests. Decision support only. Nothing is dispatched without an officer's confirmation.</div>
+<main>
+  <h1>RaktSetu</h1>
+  <div class="muted">Stock: <span id="source">loading…</span></div>
+
+  <div class="card">
+    <label for="text"><strong>Hospital request</strong></label>
+    <textarea id="text">2 units O-negative needed now. Massive transfusion protocol activated: 29F post-partum haemorrhage after caesarean, patient typed O-negative, ongoing bleeding.</textarea>
+    <div class="row">
+      <input type="text" id="hospital" placeholder="Requesting hospital (optional)">
+      <label><input type="checkbox" id="outage"> simulate Decisions API outage</label>
+      <button id="go">Route request</button>
+    </div>
+  </div>
+
+  <div id="out"></div>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const el = (tag, attrs = {}, ...kids) => {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) k === "class" ? (n.className = v) : n.setAttribute(k, v);
+  for (const k of kids) n.append(k instanceof Node ? k : document.createTextNode(k ?? ""));
+  return n;
+};
+const chip = (s) => el("span", { class: `chip ${s}` }, s);
+
+function verdictText(v) {
+  if (!v) return "–";
+  if (v.error) return `error: ${v.error}`;
+  return Object.values(v.answers).map((a) => {
+    if (a.kind === "choice") {
+      const probs = Object.entries(a.probabilities).map(([k, p]) => `${k} ${p.toFixed(2)}`).join(", ");
+      return `${a.name}: ${a.choice} [${probs}]`;
+    }
+    if (a.kind === "predicate") return `${a.name}: p=${a.probability.toFixed(2)}`;
+    return `${a.name}: ${a.kind}`;
+  }).join("\n");
+}
+
+async function confirmCand(rec, c, btn) {
+  const officer = prompt("Officer name (recorded in the audit log):");
+  if (!officer) return;
+  btn.disabled = true;
+  const r = await fetch("/confirm", { method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ request_id: rec.request.id, bank: c.bank, blood_group: c.blood_group, officer }) });
+  const body = await r.json();
+  btn.replaceWith(el("span", { class: r.ok ? "RECOMMEND" : "err" }, r.ok ? `CONFIRMED by ${officer}. ${body.note}` : body.detail));
+}
+
+function render(rec) {
+  const out = $("out");
+  out.replaceChildren();
+  const head = el("div", { class: "card" },
+    el("div", {}, chip(rec.status), "  ", el("strong", {}, rec.request.id), "  ",
+       el("span", { class: "muted" }, `group ${rec.request.blood_group ?? "?"} · units ${rec.request.units ?? "?"} · urgency ${rec.urgency_label ?? "unknown"}`)),
+    rec.reasons.length ? el("div", { class: "reasons" }, rec.reasons.join("; ")) : "");
+  out.append(head);
+
+  if (rec.draft) {
+    const d = rec.draft;
+    out.append(el("div", { class: "card" },
+      el("div", { class: "muted" }, d.fallback ? "Explanation (template: writer unavailable)" : `Explanation (${d.model})`),
+      el("p", {}, d.officer_explanation),
+      el("div", { class: "muted" }, "Draft request to bank"), el("p", {}, d.bank_request),
+      d.follow_up_question ? el("div", {}, el("strong", {}, "Ask the hospital: "), d.follow_up_question) : ""));
+  }
+
+  if (rec.candidates.length) {
+    const tbody = el("tbody");
+    for (const c of rec.candidates) {
+      const action = el("td");
+      if (c.status === "RECOMMEND" || c.status === "HOLD_FOR_HUMAN") {
+        const b = el("button", {}, "Confirm");
+        b.onclick = () => confirmCand(rec, c, b);
+        action.append(b);
+      }
+      tbody.append(el("tr", {},
+        el("td", {}, chip(c.status)),
+        el("td", {}, c.bank, el("div", { class: "reasons" }, c.reasons.join("; "))),
+        el("td", {}, c.blood_group + (c.exact ? "" : " (substitute)")),
+        el("td", {}, `${c.units_now} → ${c.units_after}`),
+        el("td", { style: "white-space:pre-line;font-size:12px" }, verdictText(c.verdict)),
+        action));
+    }
+    out.append(el("div", { class: "card scroll" },
+      el("table", {}, el("thead", {}, el("tr", {}, ...["Status", "Bank", "Group", "Units now → after", "Verdicts", ""].map((h) => el("th", {}, h)))), tbody),
+      el("p", { class: "muted" }, "Confirm writes CONFIRMED to the audit log. It does not dispatch blood.")));
+  }
+}
+
+$("go").onclick = async () => {
+  $("go").disabled = true;
+  $("out").replaceChildren(el("p", { class: "muted" }, "Judging…"));
+  try {
+    const r = await fetch("/route", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: $("text").value, hospital: $("hospital").value || null, simulate_outage: $("outage").checked }) });
+    const body = await r.json();
+    if (!r.ok) throw new Error(typeof body.detail === "string" ? body.detail : JSON.stringify(body.detail));
+    render(body);
+  } catch (e) {
+    $("out").replaceChildren(el("p", { class: "err" }, `Error: ${e.message}`));
+  } finally {
+    $("go").disabled = false;
+  }
+};
+
+fetch("/source").then((r) => r.json()).then((s) => ($("source").textContent = s.data_source))
+  .catch(() => ($("source").textContent = "unavailable"));
+</script>
+</body>
+</html>
