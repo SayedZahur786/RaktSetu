@@ -1,0 +1,18 @@
+# Every threshold RaktSetu applies. policy.py reads these; no threshold lives in code.
+
+# Request level (one Decisions API call per request)
+urgency_min_confidence: 0.6    # urgency score confidence below this -> HOLD_FOR_HUMAN
+ambiguous_hold_p: 0.3          # note_ambiguous p >= this -> HOLD_FOR_HUMAN for the whole request
+
+# Candidate level (one Decisions API call per bank)
+reserve_safe_min_p: 0.7        # need choice == safe with p >= this to RECOMMEND
+unsafe_block_p: 0.5            # p(unsafe) >= this -> candidate BLOCKED
+priority_proceed_min_p: 0.7    # need choice == proceed with p >= this to RECOMMEND
+defer_block_p: 0.5             # p(defer) >= this -> candidate BLOCKED
+substitution_min_p: 0.75       # conditional substitute needs p(note permits) >= this
+substitution_block_p: 0.25     # p(note permits) < this -> substitute BLOCKED
+
+fail_mode: closed              # any error/refusal -> HOLD_FOR_HUMAN (only "closed" is supported)
+
+# API call budget
+api_timeout_s: 30

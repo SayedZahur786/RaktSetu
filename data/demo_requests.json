@@ -1,0 +1,48 @@
+{
+  "_synthetic": "Every request, patient and pending order in this file is synthetic. Bank names and stock come from e-RaktKosh (data/eraktkosh_snapshot.json).",
+  "pending_orders": [
+    {
+      "bank": "Government Teaching General Hospital Blood Centre, Rajahmundry",
+      "blood_group": "O-",
+      "units": 6,
+      "note": "Trauma theatre now: 24M road-traffic polytrauma with splenic rupture, typed O-negative, haemodynamically unstable. Massive transfusion protocol on standby; all 6 O-neg units earmarked for this patient."
+    },
+    {
+      "bank": "Dr. Ysr-Jakkampudi Rammohan Rao Blood Centre",
+      "blood_group": "O-",
+      "units": 8,
+      "note": "Tomorrow 09:00: 41F, typed O-negative, placenta accreta for planned caesarean hysterectomy, history of massive haemorrhage. 8 units O-neg reserved for her."
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "demo1",
+      "title": "Massive transfusion, priority conflict",
+      "hospital": "Area Hospital, Rajahmundry (labour ward)",
+      "note": "2 units O-negative needed now. Massive transfusion protocol activated: 29F post-partum haemorrhage after caesarean, patient typed O-negative, ongoing bleeding.",
+      "expected_status": "ROUTED"
+    },
+    {
+      "id": "demo2",
+      "title": "Routine restock that would drain the reserve",
+      "hospital": "Community Health Centre, Peddapuram",
+      "note": "Standing weekly restock: 10 units O-negative. No active cases. Ward patients are all typed Rh-positive; we keep O-neg on the shelf out of habit.",
+      "expected_status": "ROUTED"
+    },
+    {
+      "id": "demo3",
+      "title": "Ambiguous note",
+      "hospital": "Unknown clinic",
+      "note": "need blood asap pls",
+      "expected_status": "HOLD_FOR_HUMAN"
+    },
+    {
+      "id": "demo4",
+      "title": "Decisions API outage (fail closed)",
+      "hospital": "Area Hospital, Rajahmundry (labour ward)",
+      "note": "2 units O-negative needed now. Massive transfusion protocol activated: 29F post-partum haemorrhage after caesarean, patient typed O-negative, ongoing bleeding.",
+      "simulate_outage": true,
+      "expected_status": "HOLD_FOR_HUMAN"
+    }
+  ]
+}

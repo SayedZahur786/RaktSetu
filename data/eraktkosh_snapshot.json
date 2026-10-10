@@ -1,0 +1,198 @@
+{
+ "source": "e-RaktKosh blood-availability API",
+ "fetched_at": "2026-09-26T05:19:57",
+ "banks": [
+  {
+   "name": "Dhanwantani Voluntary Blood Bank",
+   "category": "Charitable/Vol",
+   "stock": "O+Ve : 40",
+   "last_updated": "2026-09-26 07:51:55"
+  },
+  {
+   "name": "Bsu Chc Kovvuru",
+   "category": "Govt.",
+   "stock": "O+Ve : 0",
+   "last_updated": "2026-09-26 09:38:03"
+  },
+  {
+   "name": "Dr. Ysr-Jakkampudi Rammohan Rao Blood Centre",
+   "category": "Charitable/Vol",
+   "stock": "O+Ve : 92",
+   "last_updated": "2026-09-26 08:48:45"
+  },
+  {
+   "name": "GSL Trust Blood Centre",
+   "category": "Charitable/Vol",
+   "stock": "O+Ve : -15",
+   "last_updated": "2026-09-26 09:16:21"
+  },
+  {
+   "name": "Government Teaching General Hospital Blood Centre, Rajahmundry",
+   "category": "Govt.",
+   "stock": "O+Ve : 75",
+   "last_updated": "2026-09-26 09:38:43"
+  },
+  {
+   "name": "Gsl Medical College And General Hospital Blood Centre",
+   "category": "Private",
+   "stock": "O+Ve : 25",
+   "last_updated": "2026-09-26 08:27:14"
+  },
+  {
+   "name": "Bsu Chc Kadiyam",
+   "category": "Govt.",
+   "stock": "O+Ve : 0",
+   "last_updated": "2026-09-26 08:43:24"
+  },
+  {
+   "name": "Ntr Memorial Trust Blood Centre Rajamahendravaram",
+   "category": "Charitable/Vol",
+   "stock": "O+Ve : 30",
+   "last_updated": "2026-09-26 00:18:51"
+  },
+  {
+   "name": "Bsu Chc Gopalapuram",
+   "category": "Govt.",
+   "stock": "O+Ve : 0",
+   "last_updated": "2026-09-26 10:04:59"
+  },
+  {
+   "name": "Sanjeevani Voluntary Blood Centre Rajamahendravaram",
+   "category": "Charitable/Vol",
+   "stock": "O+Ve : 13",
+   "last_updated": "2026-09-26 08:47:03"
+  },
+  {
+   "name": "Bsu Chc Nidadavolu",
+   "category": "Govt.",
+   "stock": "O+Ve : 0",
+   "last_updated": "2026-09-26 08:47:47"
+  },
+  {
+   "name": "Bsu Chc Kapileswapuram",
+   "category": "Govt.",
+   "stock": "O+Ve : 0",
+   "last_updated": "2026-09-25 09:07:24"
+  },
+  {
+   "name": "Bsu Chc Gokavaram",
+   "category": "Govt.",
+   "stock": "O+Ve : 0",
+   "last_updated": "2026-09-26 08:39:47"
+  },
+  {
+   "name": "Satya Surya Voluntary Blood Center",
+   "category": "Charitable/Vol",
+   "stock": "O+Ve : 23",
+   "last_updated": "2026-09-26 09:45:30"
+  },
+  {
+   "name": "Vijayasri Blood Centre Rajahmundry",
+   "category": "Charitable/Vol",
+   "stock": "O+Ve : 1",
+   "last_updated": "2026-09-26 07:40:24"
+  },
+  {
+   "name": "Bsu Chc Mandapeta",
+   "category": "Govt.",
+   "stock": "O+Ve : 0",
+   "last_updated": "2026-09-26 08:43:31"
+  },
+  {
+   "name": "Dhanwantani Voluntary Blood Bank",
+   "category": "Charitable/Vol",
+   "stock": "O-Ve : 0",
+   "last_updated": "2026-09-26 07:51:55"
+  },
+  {
+   "name": "Bsu Chc Kovvuru",
+   "category": "Govt.",
+   "stock": "O-Ve : 0",
+   "last_updated": "2026-09-26 09:38:03"
+  },
+  {
+   "name": "Dr. Ysr-Jakkampudi Rammohan Rao Blood Centre",
+   "category": "Charitable/Vol",
+   "stock": "O-Ve : 12",
+   "last_updated": "2026-09-26 08:48:45"
+  },
+  {
+   "name": "GSL Trust Blood Centre",
+   "category": "Charitable/Vol",
+   "stock": "O-Ve : -1",
+   "last_updated": "2026-09-26 09:16:21"
+  },
+  {
+   "name": "Government Teaching General Hospital Blood Centre, Rajahmundry",
+   "category": "Govt.",
+   "stock": "O-Ve : 6",
+   "last_updated": "2026-09-26 09:38:43"
+  },
+  {
+   "name": "Gsl Medical College And General Hospital Blood Centre",
+   "category": "Private",
+   "stock": "O-Ve : 1",
+   "last_updated": "2026-09-26 08:27:14"
+  },
+  {
+   "name": "Bsu Chc Kadiyam",
+   "category": "Govt.",
+   "stock": "O-Ve : 0",
+   "last_updated": "2026-09-26 08:43:24"
+  },
+  {
+   "name": "Ntr Memorial Trust Blood Centre Rajamahendravaram",
+   "category": "Charitable/Vol",
+   "stock": "O-Ve : 4",
+   "last_updated": "2026-09-26 00:18:51"
+  },
+  {
+   "name": "Bsu Chc Gopalapuram",
+   "category": "Govt.",
+   "stock": "O-Ve : 0",
+   "last_updated": "2026-09-26 10:04:59"
+  },
+  {
+   "name": "Sanjeevani Voluntary Blood Centre Rajamahendravaram",
+   "category": "Charitable/Vol",
+   "stock": "O-Ve : 0",
+   "last_updated": "2026-09-26 08:47:03"
+  },
+  {
+   "name": "Bsu Chc Nidadavolu",
+   "category": "Govt.",
+   "stock": "O-Ve : 0",
+   "last_updated": "2026-09-26 08:47:47"
+  },
+  {
+   "name": "Bsu Chc Kapileswapuram",
+   "category": "Govt.",
+   "stock": "O-Ve : 0",
+   "last_updated": "2026-09-25 09:07:24"
+  },
+  {
+   "name": "Bsu Chc Gokavaram",
+   "category": "Govt.",
+   "stock": "O-Ve : 0",
+   "last_updated": "2026-09-26 08:39:47"
+  },
+  {
+   "name": "Satya Surya Voluntary Blood Center",
+   "category": "Charitable/Vol",
+   "stock": "O-Ve : 0",
+   "last_updated": "2026-09-26 09:45:30"
+  },
+  {
+   "name": "Vijayasri Blood Centre Rajahmundry",
+   "category": "Charitable/Vol",
+   "stock": "O-Ve : 0",
+   "last_updated": "2026-09-26 07:40:24"
+  },
+  {
+   "name": "Bsu Chc Mandapeta",
+   "category": "Govt.",
+   "stock": "O-Ve : 0",
+   "last_updated": "2026-09-26 08:43:31"
+  }
+ ]
+}
