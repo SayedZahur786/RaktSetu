@@ -11,6 +11,8 @@ priority_proceed_min_p: 0.7    # need choice == proceed with p >= this to RECOMM
 defer_block_p: 0.5             # p(defer) >= this -> candidate BLOCKED
 substitution_min_p: 0.75       # conditional substitute needs p(note permits) >= this
 substitution_block_p: 0.25     # p(note permits) < this -> substitute BLOCKED
+min_units_after_dispatch: 1    # units left at the bank below this -> HOLD_FOR_HUMAN (never empty a bank unasked).
+                               # Added after the first live eval: c13 routed 4 units leaving a bank with 0 O-neg.
 
 fail_mode: closed              # any error/refusal -> HOLD_FOR_HUMAN (only "closed" is supported)
 

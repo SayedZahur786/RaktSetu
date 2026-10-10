@@ -1,0 +1,30 @@
+{"id": "c01", "note": "2 units O-negative now. Massive transfusion protocol: 29F post-partum haemorrhage, typed O-negative, still bleeding.", "expected_urgency_band": 3, "expected_status": "ROUTED"}
+{"id": "c02", "note": "4 units O positive, MTP activated, 52M ruptured abdominal aortic aneurysm, typed O-positive.", "expected_urgency_band": 3, "expected_status": "ROUTED"}
+{"id": "c03", "note": "6 units O+ for road traffic polytrauma in haemorrhagic shock, patient typed O+.", "expected_urgency_band": 3, "expected_status": "ROUTED"}
+{"id": "c04", "note": "2 units O-negative, emergency: 8-year-old with splenic laceration, typed O-negative, actively bleeding.", "expected_urgency_band": 3, "expected_status": "ROUTED"}
+{"id": "c05", "note": "5 units O-negative for ruptured ectopic pregnancy, patient O-negative, in shock.", "expected_urgency_band": 3, "expected_status": "HOLD_FOR_HUMAN"}
+{"id": "c06", "note": "3 units B-negative, active GI bleed, haemoglobin 5, patient typed B-negative.", "expected_urgency_band": 3, "expected_status": "ROUTED"}
+{"id": "c07", "note": "MTP: 4 units A positive, 30F placental abruption, typed A+.", "expected_urgency_band": 3, "expected_status": "ROUTED"}
+{"id": "c08", "note": "2 units AB+ urgently, massive haemorrhage during surgery, patient AB positive.", "expected_urgency_band": 3, "expected_status": "ROUTED"}
+{"id": "c09", "note": "2 units O+ for 67F with symptomatic anaemia, Hb 6.1, transfuse today, typed O-positive.", "expected_urgency_band": 2, "expected_status": "ROUTED"}
+{"id": "c10", "note": "1 unit O-negative for neonatal exchange transfusion today, baby typed O-negative.", "expected_urgency_band": 2, "expected_status": "ROUTED"}
+{"id": "c11", "note": "3 units O+ for sickle cell crisis, 19M typed O+, transfuse within hours.", "expected_urgency_band": 2, "expected_status": "ROUTED"}
+{"id": "c12", "note": "2 units B+ for dengue with bleeding, platelets low and Hb falling, patient B+.", "expected_urgency_band": 2, "expected_status": "ROUTED"}
+{"id": "c13", "note": "4 units O-negative for 45M upper GI bleed, typed O-negative, stable for now but Hb dropping.", "expected_urgency_band": 2, "expected_status": "HOLD_FOR_HUMAN"}
+{"id": "c14", "note": "2 units O+ crossmatched for elective knee replacement on Monday, patient O-positive.", "expected_urgency_band": 1, "expected_status": "ROUTED"}
+{"id": "c15", "note": "Planned thalassaemia day-care transfusion next Tuesday: 2 units O+, child typed O-positive.", "expected_urgency_band": 1, "expected_status": "ROUTED"}
+{"id": "c16", "note": "Elective hysterectomy next week, reserve 2 units O-negative, patient typed O-negative.", "expected_urgency_band": 1, "expected_status": "ROUTED"}
+{"id": "c17", "note": "Reserve 3 units A-negative for elective CABG on Thursday, patient A-negative.", "expected_urgency_band": 1, "expected_status": "ROUTED"}
+{"id": "c18", "note": "Scheduled chemotherapy support on Friday: 1 unit O+ for 58M typed O-positive.", "expected_urgency_band": 1, "expected_status": "ROUTED"}
+{"id": "c19", "note": "Monthly restock: 10 units O-negative. No active cases. All ward patients are typed Rh-positive.", "expected_urgency_band": 0, "expected_status": "ROUTED"}
+{"id": "c20", "note": "Weekly restock: 12 units O-negative for the shelf. No current patients.", "expected_urgency_band": 0, "expected_status": "HOLD_FOR_HUMAN"}
+{"id": "c21", "note": "Routine restock: 5 units O-positive for the blood storage unit.", "expected_urgency_band": 0, "expected_status": "ROUTED"}
+{"id": "c22", "note": "Standing order: 8 units O+ for the district hospital shelf.", "expected_urgency_band": 0, "expected_status": "ROUTED"}
+{"id": "c23", "note": "Restock 6 units O-negative for the CHC shelf, no active cases.", "expected_urgency_band": 0, "expected_status": "HOLD_FOR_HUMAN"}
+{"id": "c24", "note": "Restock 20 units O-negative.", "expected_urgency_band": 0, "expected_status": "HOLD_FOR_HUMAN"}
+{"id": "c25", "note": "need blood asap pls", "expected_urgency_band": 2, "expected_status": "HOLD_FOR_HUMAN"}
+{"id": "c26", "note": "send 3 units for theatre", "expected_urgency_band": 2, "expected_status": "HOLD_FOR_HUMAN"}
+{"id": "c27", "note": "O negative urgently for accident victim", "expected_urgency_band": 3, "expected_status": "HOLD_FOR_HUMAN"}
+{"id": "c28", "note": "2 units of blood, patient bleeding", "expected_urgency_band": 3, "expected_status": "HOLD_FOR_HUMAN"}
+{"id": "c29", "note": "O-negative or B positive, 2 units, whichever is available, for surgery tomorrow.", "expected_urgency_band": 1, "expected_status": "HOLD_FOR_HUMAN"}
+{"id": "c30", "note": "100 units O-positive for disaster preparedness stock.", "expected_urgency_band": 0, "expected_status": "NO_STOCK"}

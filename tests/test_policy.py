@@ -52,6 +52,12 @@ def test_recommend_when_every_check_passes(policy):
     assert pol.candidate_status(bank_verdict(), False, policy) == ("RECOMMEND", ["all checks passed"])
 
 
+def test_dispatch_that_empties_bank_holds(policy):
+    status, reasons = pol.candidate_status(bank_verdict(), False, policy, units_after=policy.min_units_after_dispatch - 1)
+    assert status == "HOLD_FOR_HUMAN" and "empty" in reasons[0]
+    assert pol.candidate_status(bank_verdict(), False, policy, units_after=policy.min_units_after_dispatch)[0] == "RECOMMEND"
+
+
 def test_unsafe_reserve_blocks(policy):
     status, reasons = pol.candidate_status(bank_verdict(safe=0.1, unsafe=policy.unsafe_block_p), False, policy)
     assert status == "BLOCKED" and "unsafe" in reasons[0]

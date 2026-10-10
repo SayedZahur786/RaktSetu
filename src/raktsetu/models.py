@@ -22,6 +22,7 @@ class Policy(BaseModel):
     defer_block_p: float = Field(ge=0, le=1)
     substitution_min_p: float = Field(ge=0, le=1)
     substitution_block_p: float = Field(ge=0, le=1)
+    min_units_after_dispatch: int = Field(ge=0)
     fail_mode: str = "closed"
     api_timeout_s: float = Field(gt=0)
 

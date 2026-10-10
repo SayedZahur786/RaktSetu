@@ -1,0 +1,98 @@
+{
+ "latency_ms": 165.6,
+ "recorded_at": "2026-10-10T12:28:41",
+ "request": {
+  "api": "decisions.create",
+  "input": "Blood request c15 from a hospital: 2 units of O+ packed red cells. Request urgency (judged earlier): planned / elective.\nHospital note: \"Planned thalassaemia day-care transfusion next Tuesday: 2 units O+, child typed O-positive.\"\nCandidate bank: Government Teaching General Hospital Blood Centre, Rajahmundry.\nGroup that would be dispensed: O+ (exact match).\nO+ units at this bank now: 75. Units remaining after this dispatch: 73.\nUnits of O+ already requested by pending orders at this bank: 0.\nPending orders at this bank for O+: none",
+  "model": "gpt-6-luna",
+  "questions": [
+   {
+    "choices": [
+     {
+      "description": "Remaining stock comfortably covers known pending needs.",
+      "value": "safe"
+     },
+     {
+      "description": "Remaining stock is low but no described patient is left without blood.",
+      "value": "tight"
+     },
+     {
+      "description": "Dispatch would leave a described pending patient without blood.",
+      "value": "unsafe"
+     }
+    ],
+    "instructions": "After this dispatch, is the bank's remaining stock of the dispensed group adequate for the pending orders described at this bank?",
+    "name": "reserve_check",
+    "type": "choice"
+   },
+   {
+    "choices": [
+     {
+      "description": "No pending order at this bank has a more urgent need for the same group.",
+      "value": "proceed"
+     },
+     {
+      "description": "A pending order at this bank has a more urgent need for the same group.",
+      "value": "defer"
+     }
+    ],
+    "instructions": "Should this request be served from this bank now, or deferred because a pending order at this bank has a more urgent clinical need for the same blood group?",
+    "name": "priority_check",
+    "type": "choice"
+   }
+  ]
+ },
+ "response": {
+  "answers": [
+   {
+    "choice": "safe",
+    "confidence": 1.0,
+    "name": "reserve_check",
+    "probabilities": [
+     {
+      "probability": 1.0,
+      "value": "safe"
+     },
+     {
+      "probability": 0.0,
+      "value": "tight"
+     },
+     {
+      "probability": 0.0,
+      "value": "unsafe"
+     }
+    ],
+    "type": "choice"
+   },
+   {
+    "choice": "proceed",
+    "confidence": 1.0,
+    "name": "priority_check",
+    "probabilities": [
+     {
+      "probability": 1.0,
+      "value": "proceed"
+     },
+     {
+      "probability": 0.0,
+      "value": "defer"
+     }
+    ],
+    "type": "choice"
+   }
+  ],
+  "model": "gpt-6-luna",
+  "usage": {
+   "input_tokens": 450,
+   "input_tokens_details": {
+    "cache_write_tokens": 0,
+    "cached_tokens": 0
+   },
+   "output_tokens": 0,
+   "output_tokens_details": {
+    "reasoning_tokens": 0
+   },
+   "total_tokens": 450
+  }
+ }
+}

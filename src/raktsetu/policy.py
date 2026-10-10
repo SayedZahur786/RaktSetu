@@ -54,9 +54,12 @@ def request_gate(verdict: Verdict | None, policy: Policy) -> tuple[bool, list[st
     return not reasons, reasons
 
 
-def candidate_status(verdict: Verdict | None, needs_permission: bool,
-                     policy: Policy) -> tuple[CandidateStatus, list[str]]:
-    """Status for one bank with enough stock. BLOCKED wins over HOLD; RECOMMEND needs every check to pass."""
+def candidate_status(verdict: Verdict | None, needs_permission: bool, policy: Policy,
+                     units_after: int | None = None) -> tuple[CandidateStatus, list[str]]:
+    """Status for one bank with enough stock. BLOCKED wins over HOLD; RECOMMEND needs every check to pass.
+
+    `units_after` is the code-computed stock left at the bank; below the policy floor it holds.
+    """
     if verdict is None:
         return "HOLD_FOR_HUMAN", ["not judged"]
     if verdict.error:
@@ -99,6 +102,10 @@ def candidate_status(verdict: Verdict | None, needs_permission: bool,
                 blocked.append(f"note does not permit substitution (p={sub.probability:.2f})")
             elif sub.probability < policy.substitution_min_p:
                 hold.append(f"substitution permission uncertain (p={sub.probability:.2f})")
+
+    if units_after is not None and units_after < policy.min_units_after_dispatch:
+        hold.append(f"dispatch would empty this bank ({units_after} units left, floor "
+                    f"{policy.min_units_after_dispatch})")
 
     if blocked:
         return "BLOCKED", blocked + hold

@@ -1,0 +1,89 @@
+{
+ "latency_ms": 235.9,
+ "recorded_at": "2026-10-10T12:28:39",
+ "request": {
+  "api": "decisions.create",
+  "input": "Blood request c10 from a hospital.\nHospital note: \"1 unit O-negative for neonatal exchange transfusion today, baby typed O-negative.\"\nParsed by code from the note: blood group O-, units 1.",
+  "model": "gpt-6-luna",
+  "questions": [
+   {
+    "instructions": "How urgent is the clinical need behind this blood request, judged from the hospital's note?",
+    "levels": [
+     {
+      "description": "Stock replenishment or standing order; no patient currently waiting.",
+      "label": "routine restock"
+     },
+     {
+      "description": "A scheduled procedure or transfusion that can wait a day or more.",
+      "label": "planned / elective"
+     },
+     {
+      "description": "A patient needs blood within hours but is not in immediate danger.",
+      "label": "urgent"
+     },
+     {
+      "description": "Active haemorrhage, massive transfusion protocol, or a patient who may die without blood now.",
+      "label": "massive transfusion or life-threatening"
+     }
+    ],
+    "name": "urgency",
+    "type": "score"
+   },
+   {
+    "instructions": "The request cannot be acted on safely because the blood group requested, the number of units, or what the blood is for is missing or unclear. A request that states all three clearly is not ambiguous, even if it asks for a group the patients may not need.",
+    "name": "note_ambiguous",
+    "type": "predicate"
+   }
+  ]
+ },
+ "response": {
+  "answers": [
+   {
+    "confidence": 0.98,
+    "name": "urgency",
+    "probabilities": [
+     {
+      "label": "routine restock",
+      "probability": 0.0,
+      "value": 0
+     },
+     {
+      "label": "planned / elective",
+      "probability": 0.02,
+      "value": 1
+     },
+     {
+      "label": "urgent",
+      "probability": 0.98,
+      "value": 2
+     },
+     {
+      "label": "massive transfusion or life-threatening",
+      "probability": 0.0,
+      "value": 3
+     }
+    ],
+    "score": 1.98,
+    "type": "score"
+   },
+   {
+    "name": "note_ambiguous",
+    "probability": 0.0,
+    "type": "predicate"
+   }
+  ],
+  "model": "gpt-6-luna",
+  "usage": {
+   "input_tokens": 435,
+   "input_tokens_details": {
+    "cache_write_tokens": 0,
+    "cached_tokens": 0
+   },
+   "output_tokens": 0,
+   "output_tokens_details": {
+    "reasoning_tokens": 0
+   },
+   "total_tokens": 435
+  }
+ }
+}

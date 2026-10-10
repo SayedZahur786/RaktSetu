@@ -134,7 +134,7 @@ class Router:
             verdicts = list(pool.map(run, todo))
         for c, v in zip(todo, verdicts):
             c.verdict = v
-            c.status, c.reasons = pol.candidate_status(v, c.needs_permission, self.policy)
+            c.status, c.reasons = pol.candidate_status(v, c.needs_permission, self.policy, c.units_after)
 
     def route(self, req: Request, stock: StockSnapshot) -> Recommendation:
         urgency_v = self._ask(request_facts(req), REQUEST_QUESTIONS)

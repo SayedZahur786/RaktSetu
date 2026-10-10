@@ -87,7 +87,8 @@ def cmd_demo(args: argparse.Namespace) -> int:
         router = build_router(simulate_outage=args.simulate_outage or sc.simulate_outage)
         rec = router.route(parse_request(sc.id, sc.note, sc.hospital), stock)
         print_recommendation(rec, sc.title)
-        rows.append((sc.id, sc.title, rec.status, sc.expected_status, rec.chosen.bank if rec.chosen else "-"))
+        expected = "HOLD_FOR_HUMAN" if args.simulate_outage else sc.expected_status  # outage must always hold
+        rows.append((sc.id, sc.title, rec.status, expected, rec.chosen.bank if rec.chosen else "-"))
     print(f"\n{'━' * 100}\nSUMMARY")
     for rid, title, got, want, bank in rows:
         mark = "ok " if got == want else "!! "
