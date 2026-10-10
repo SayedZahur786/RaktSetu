@@ -28,9 +28,9 @@ Return JSON with exactly these fields:
   hospital). If no bank was chosen, write one sentence saying no request is being sent and why.
 - officer_explanation: 2-3 sentences for the officer citing the verdicts and computed facts given
   (stock now/after, reserve and priority verdicts, substitution if any). State that an officer must confirm.
-- follow_up_question: if status is HOLD_FOR_HUMAN, the single most useful question to ask the requesting
-  hospital (for an unclear note: which blood group, how many units, and for what clinical reason).
-  Otherwise null.
+- follow_up_question: only if status is HOLD_FOR_HUMAN because the request note is missing or unclear
+  (ambiguous note, blood group or units not stated): the single question to ask the requesting hospital,
+  covering which blood group, how many units, and for what clinical reason. Otherwise null.
 Plain text inside each field. No markdown. Do not invent facts not present in the input."""
 
 SCHEMA: dict[str, Any] = {

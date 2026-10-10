@@ -38,8 +38,9 @@ REQUEST_QUESTIONS: list[QuestionSpec] = [
     QuestionSpec(name="urgency", kind="score", options=URGENCY_LEVELS,
                  instructions="How urgent is the clinical need behind this blood request, judged from the hospital's note?"),
     QuestionSpec(name="note_ambiguous", kind="predicate",
-                 instructions="The request lacks information needed to act on it safely: the blood group, the number "
-                              "of units, or the clinical reason is missing, unclear, or contradictory."),
+                 instructions="The request cannot be acted on safely because the blood group requested, the number "
+                              "of units, or what the blood is for is missing or unclear. A request that states all "
+                              "three clearly is not ambiguous, even if it asks for a group the patients may not need."),
 ]
 
 RESERVE_CHECK = QuestionSpec(
