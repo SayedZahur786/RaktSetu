@@ -111,11 +111,13 @@ _STATUS_ORDER: dict[str, int] = {"RECOMMEND": 0, "HOLD_FOR_HUMAN": 1, "BLOCKED":
 
 
 def rank(candidates: list[Candidate]) -> list[Candidate]:
-    """RECOMMEND first (exact before substitute, most units left, then distance when known),
-    then HOLD_FOR_HUMAN, BLOCKED and NO_STOCK. Nothing is dropped."""
+    """RECOMMEND first (exact, then always-compatible substitutes, then substitutes that rely on
+    the note's permission; most units left; distance when known), then HOLD_FOR_HUMAN,
+    BLOCKED and NO_STOCK. Nothing is dropped."""
     def key(c: Candidate) -> tuple[int, int, int, float]:
+        match = 0 if c.exact else (2 if c.needs_permission else 1)
         distance = c.distance_km if c.distance_km is not None else 0.0
-        return (_STATUS_ORDER[c.status], 0 if c.exact else 1, -c.units_after, distance)
+        return (_STATUS_ORDER[c.status], match, -c.units_after, distance)
     return sorted(candidates, key=key)
 
 

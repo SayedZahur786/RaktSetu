@@ -126,6 +126,13 @@ def test_rank_orders_status_exact_units_distance():
     assert [c.bank for c in ranked] == ["many", "few", "sub", "hold", "blocked", "none"]
 
 
+def test_rank_prefers_unconditional_substitute_over_permission_based():
+    cond = cand("cond", "RECOMMEND", exact=False, after=40)
+    cond.needs_permission = True
+    ranked = pol.rank([cond, cand("safe-sub", "RECOMMEND", exact=False, after=3)])
+    assert [c.bank for c in ranked] == ["safe-sub", "cond"]
+
+
 def test_rank_uses_distance_only_as_tiebreak():
     ranked = pol.rank([cand("far", "RECOMMEND", distance=20), cand("near", "RECOMMEND", distance=3)])
     assert [c.bank for c in ranked] == ["near", "far"]
